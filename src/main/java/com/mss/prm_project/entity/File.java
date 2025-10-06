@@ -10,13 +10,17 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-@Table(name = "roles")
-public class Role extends BaseEntity {
+@Table(name = "files")
+public class File extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "role_id")
-    int roleId;
+    @Column(name = "file_id")
+    int fileId;
 
-    @Column(name = "role_name", columnDefinition = "nvarchar(100)")
-    String roleName;
+    @Column(name = "file_url")
+    String fileUrl;
+
+    @OneToOne
+    @JoinColumn(name = "paper_id", referencedColumnName = "paper_id")
+    Paper paper;
 }

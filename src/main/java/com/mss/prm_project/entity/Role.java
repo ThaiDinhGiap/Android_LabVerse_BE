@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "roles")
 public class Role extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")
     int roleId;
 

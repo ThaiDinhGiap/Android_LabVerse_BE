@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "files")
 public class File extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "file_id")
     int fileId;
 

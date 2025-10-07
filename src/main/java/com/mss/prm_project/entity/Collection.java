@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name = "collections")
 public class Collection extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "collection_id")
     int collectionId;
 

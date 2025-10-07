@@ -17,7 +17,7 @@ import java.util.Set;
 @Table(name = "users")
 public class User extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     int userId;
 

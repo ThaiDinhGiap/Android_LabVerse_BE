@@ -13,11 +13,11 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "search_queries")
 public class SearchQuery extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "query_id")
     int queryId;
 
-    @Column(name = "query_text", columnDefinition = "nvarchar(max)")
+    @Column(name = "query_text", length = 500)
     String queryText;
 
     @ManyToOne(fetch = FetchType.LAZY)

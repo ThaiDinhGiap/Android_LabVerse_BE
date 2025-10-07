@@ -17,7 +17,7 @@ import java.util.Set;
 @Table(name = "papers")
 public class Paper extends  BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "paper_id")
     int paperId;
 

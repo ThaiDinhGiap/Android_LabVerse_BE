@@ -18,11 +18,11 @@ import lombok.experimental.FieldDefaults;
 )
 public class Discussion extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reading_list_id")
     int readingListId;
 
-    @Column(name = "message", columnDefinition = "nvarchar(max)")
+    @Column(name = "message", length = 500)
     String message;
 
     @ManyToOne(fetch = FetchType.LAZY)

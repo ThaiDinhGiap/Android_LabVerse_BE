@@ -19,4 +19,11 @@ public class Role extends BaseEntity {
 
     @Column(name = "role_name", columnDefinition = "nvarchar(100)")
     String roleName;
+
+    public Role(Long id) {
+        this.setId(id);
+    }
+
+    private void setId(Long id) {
+    }
 }

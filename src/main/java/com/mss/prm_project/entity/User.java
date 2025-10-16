@@ -55,6 +55,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "provider", length = 20)
     AuthProvider provider;
 
+    @OneToMany(mappedBy = "user")
+    List<Paper> paper;
+
     @Column(name = "enabled")
     boolean enabled;
 

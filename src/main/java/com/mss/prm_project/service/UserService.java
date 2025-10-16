@@ -9,4 +9,5 @@ public interface UserService {
     UserDTO getUserById(Long userId) throws Exception;
     Optional<UserDTO> getUserByEmail(String email);
     UserDTO createUser(User user);
+    UserDTO getUserByGoogleSub(String sub) throws Exception;
 }

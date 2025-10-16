@@ -1,6 +1,5 @@
 package com.mss.prm_project.entity;
 
-import com.mss.prm_project.enumerate.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,12 +51,18 @@ public class User extends BaseEntity implements UserDetails {
     @ManyToMany(mappedBy = "users")
     Set<Collection> collections = new HashSet<>();
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "provider", length = 20)
-    AuthProvider provider;
 
     @Column(name = "enabled")
     boolean enabled;
+
+    @Column(name = "google_sub", unique = true)
+    private String googleSub;
+
+    @Column(name = "email_verify_at", updatable = false)
+    private LocalDateTime emailVerifyAt;
+
+    @Column(name = "google_link_at", updatable = false)
+    private LocalDateTime googleLinkAt;
 
     @Override
     public java.util.Collection<? extends GrantedAuthority> getAuthorities() {

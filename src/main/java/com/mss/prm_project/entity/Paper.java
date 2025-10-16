@@ -36,8 +36,11 @@ public class Paper extends  BaseEntity {
     @Column(name = "publish_date")
     LocalDateTime publishDate;
 
-    @Column(name = "page_number")
-    int pageNumber;
+//    @Column(name = "page_number")
+//    int pageNumber;
+
+    @Column(name = "is_Offline")
+    boolean isOffline;
 
     @Column(name = "priority")
     int priority;

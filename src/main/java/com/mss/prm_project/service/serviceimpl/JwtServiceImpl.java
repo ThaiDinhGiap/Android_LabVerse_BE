@@ -41,9 +41,10 @@ public class JwtServiceImpl implements JwtService {
         final String roleName = resolveRoleName(user);
 
         return Jwts.builder()
-                .setSubject(user.getEmail())
+                .setSubject(user.getUsername())
                 .claim("id", user.getId())
                 .claim("roles", roleName)
+                .claim("email", user.getEmail())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiresAt)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -59,9 +60,10 @@ public class JwtServiceImpl implements JwtService {
         final String roleName = resolveRoleName(user);
 
         return Jwts.builder()
-                .setSubject(user.getEmail())
+                .setSubject(user.getUsername())
                 .claim("id", user.getId())
                 .claim("roles", roleName)
+                .claim("email", user.getEmail())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiresAt)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -70,6 +72,18 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String extractUsername(String token) {
+        Claims claims = extractAllClaims(token);
+        if (claims != null) {
+            Date expiration = claims.getExpiration();
+            if (expiration.after(new Date())) {
+                return claims.getSubject();
+            } else return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String extractEmail(String token) {
         Claims claims = extractAllClaims(token);
         if (claims != null) {
             Date expiration = claims.getExpiration();

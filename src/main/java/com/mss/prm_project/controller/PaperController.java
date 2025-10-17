@@ -4,6 +4,7 @@ import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.service.PaperService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,8 +35,8 @@ public class PaperController {
         return ResponseEntity.ok(paperDTOs);
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<PaperDTO> uploadPaper(@RequestParam("dto") PaperDTO dto,  @RequestParam("file") MultipartFile file) throws IOException {
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PaperDTO> uploadPaper(@RequestPart("dto") PaperDTO dto,  @RequestParam("file") MultipartFile file) throws IOException {
         PaperDTO result = paperService.insertPaper(dto, file);
         return ResponseEntity.ok(result);
     }

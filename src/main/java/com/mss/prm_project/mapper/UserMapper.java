@@ -15,6 +15,7 @@ public interface UserMapper {
     UserDTO userToUserDTO(User user);
 
     @Mapping(source = "role", target = "role")
+    @Mapping(source = "id", target = "userId")
     User userDTOToUser(UserDTO dto);
 
     default Role map(Long id) {

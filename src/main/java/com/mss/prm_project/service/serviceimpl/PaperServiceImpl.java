@@ -6,6 +6,7 @@ import com.mss.prm_project.entity.File;
 import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.mapper.FileMapper;
 import com.mss.prm_project.mapper.PaperMapper;
+import com.mss.prm_project.mapper.UserMapper;
 import com.mss.prm_project.repository.FileRepository;
 import com.mss.prm_project.repository.PaperRepository;
 import com.mss.prm_project.repository.UserRepository;
@@ -51,11 +52,11 @@ public class PaperServiceImpl implements PaperService {
             for (Paper paper : paperList) {
                 PaperDTO paperDTO = new PaperDTO();
                 paperDTO.setTitle(paper.getTitle());
-                paperDTO.setAuthor(paper.getAuthor());
                 paperDTO.setJournal(paper.getJournal());
                 paperDTO.setPublisher(paper.getPublisher());
                 paperDTO.setPublishDate(paper.getPublishDate());
                 paperDTO.setOffline(paper.isOffline());
+                paperDTO.setUser(UserMapper.INSTANCE.userToUserDTO(paper.getUser()));
                 paperDTO.setPriority(paper.getPriority());
                 File file = fileRepository.findByPaperPaperId(paper.getPaperId());
                 if (file != null) {
@@ -71,12 +72,13 @@ public class PaperServiceImpl implements PaperService {
     @Override
     public PaperDTO insertPaper(PaperDTO dto, MultipartFile multipartFile) throws IOException {
         File file = new File();
-        file.setFileUrl(s3ServiceV2.uploadFile(multipartFile));
+//        file.setFileUrl(s3ServiceV2.uploadFile(multipartFile));
+        file.setFileUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
+        File savedfile = fileRepository.save(file);
         Paper paper = PaperMapper.INSTANCE.toEntity(dto);
-        paper.setOffline(false);
-        File savefile = fileRepository.save(file);
-        FileDTO fileDTO = FileMapper.INSTANCE.toDTO(savefile);
-        dto.setFile(fileDTO);
-        return dto;
+        Paper savedPaper = paperRepository.save(paper);
+        savedfile.setPaper(savedPaper);
+        fileRepository.save(savedfile);
+        return PaperMapper.INSTANCE.toDTO(savedPaper);
     }
 }

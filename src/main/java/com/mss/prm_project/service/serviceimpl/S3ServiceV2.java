@@ -29,7 +29,6 @@ public class S3ServiceV2 {
         PutObjectRequest putReq = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
-                .acl(ObjectCannedACL.PUBLIC_READ) // 👈 Cho phép truy cập công khai
                 .contentType(multipartFile.getContentType())
                 .build();
         s3.putObject(putReq, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));

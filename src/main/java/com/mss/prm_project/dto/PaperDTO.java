@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 @Setter
 public class PaperDTO extends BaseDTO{
     String title;
-    String author;
     String journal;
     String publisher;
     LocalDateTime publishDate;
     boolean isOffline;
     int priority;
     FileDTO file;
+    UserDTO user;
 }

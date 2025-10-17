@@ -35,7 +35,7 @@ public class PaperController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<PaperDTO> uploadPaper(@RequestPart PaperDTO dto,  @RequestPart("file") MultipartFile file) throws IOException {
+    public ResponseEntity<PaperDTO> uploadPaper(@RequestParam("dto") PaperDTO dto,  @RequestParam("file") MultipartFile file) throws IOException {
         PaperDTO result = paperService.insertPaper(dto, file);
         return ResponseEntity.ok(result);
     }

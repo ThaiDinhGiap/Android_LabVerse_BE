@@ -50,20 +50,12 @@ public class PaperServiceImpl implements PaperService {
         if (userRepository.existsById((long) userId)) {
             List <Paper> paperList = paperRepository.findByUserUserId(userId);
             for (Paper paper : paperList) {
-                PaperDTO paperDTO = new PaperDTO();
-                paperDTO.setTitle(paper.getTitle());
-                paperDTO.setJournal(paper.getJournal());
-                paperDTO.setPublisher(paper.getPublisher());
-                paperDTO.setPublishDate(paper.getPublishDate());
-                paperDTO.setOffline(paper.isOffline());
-                paperDTO.setUser(UserMapper.INSTANCE.userToUserDTO(paper.getUser()));
-                paperDTO.setPriority(paper.getPriority());
+                PaperDTO dto = PaperMapper.INSTANCE.toDTO(paper);
                 File file = fileRepository.findByPaperPaperId(paper.getPaperId());
                 if (file != null) {
-                    FileDTO fileDTO = FileMapper.INSTANCE.toDTO(file);
-                    paperDTO.setFile(fileDTO);
+                    dto.setFileUrl(file.getFileUrl());
                 }
-                resultList.add(paperDTO);
+                resultList.add(dto);
             }
         }
         return resultList;

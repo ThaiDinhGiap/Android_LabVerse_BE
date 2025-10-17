@@ -14,6 +14,6 @@ public class PaperDTO extends BaseDTO{
     LocalDateTime publishDate;
     boolean isOffline;
     int priority;
-    FileDTO file;
     UserDTO user;
+    String fileUrl;
 }

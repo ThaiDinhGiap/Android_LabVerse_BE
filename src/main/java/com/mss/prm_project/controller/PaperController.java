@@ -30,7 +30,7 @@ public class PaperController {
     }
 
     @GetMapping("/list-papers-for-PIs")
-    public ResponseEntity<List<?>> getPapersByUserId(@RequestParam int userId){
+    public ResponseEntity<List<?>> getPapersByUserIdWithPIRole(@RequestParam int userId){
         List<PaperDTO> paperDTOs = paperService.getPaperByUserId(userId);
         return ResponseEntity.ok(paperDTOs);
     }

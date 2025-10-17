@@ -42,7 +42,7 @@ public class JwtServiceImpl implements JwtService {
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
-                .claim("id", user.getId())
+                .claim("id", user.getUserId())
                 .claim("roles", roleName)
                 .claim("email", user.getEmail())
                 .setIssuedAt(issuedAt)
@@ -61,7 +61,7 @@ public class JwtServiceImpl implements JwtService {
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
-                .claim("id", user.getId())
+                .claim("id", user.getUserId())
                 .claim("roles", roleName)
                 .claim("email", user.getEmail())
                 .setIssuedAt(issuedAt)

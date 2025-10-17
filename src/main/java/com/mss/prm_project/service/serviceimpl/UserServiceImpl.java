@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserById(Long userId) throws Exception {
-        return userRepository.findById(userId + 1)
+        return userRepository.findById(userId)
                 .map(UserMapper.INSTANCE::userToUserDTO)
                 .orElseThrow(() -> new Exception("User Not Found"));
     }

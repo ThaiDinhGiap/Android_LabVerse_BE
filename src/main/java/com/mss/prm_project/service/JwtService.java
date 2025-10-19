@@ -16,4 +16,8 @@ public interface JwtService {
     Date extractExpiration(String token);
 
     long extractUserId(String token);
+
+    String generateEmailVerifyToken(String email) throws Exception;
+
+    String validateEmailVerifyToken(String token) throws Exception;
 }

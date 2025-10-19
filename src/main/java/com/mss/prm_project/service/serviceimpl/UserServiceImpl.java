@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.mss.prm_project.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -44,5 +45,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByGoogleSub(googleSub)
                 .map(UserMapper.INSTANCE::userToUserDTO)
                 .orElseThrow(() -> new Exception("User Not Found"));
+    }
+
+    @Override
+    public boolean checkIfEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public void updateEmailVerified(String email) throws Exception {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new Exception("User Not Found"));
+
+        user.setEmailVerifyAt(LocalDateTime.now());
+        userRepository.save(user);
     }
 }

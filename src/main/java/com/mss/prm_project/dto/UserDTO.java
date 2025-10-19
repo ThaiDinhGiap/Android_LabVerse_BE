@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=true)
 public class UserDTO extends BaseDTO implements Serializable {
-    private long userId;
     private String fullName;
     private String email;
     private String username;

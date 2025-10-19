@@ -36,22 +36,18 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         log.debug("AUTH-FILTER uri={} servletPath={} bypass={}",
                 request.getRequestURI(), request.getServletPath(), isBypassToken(request));
 
-        // Bypass các path public
         if (isBypassToken(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Lấy token từ header Authorization (hỗ trợ Bearer case-insensitive, có/không khoảng trắng)
         final String jwt = resolveBearerToken(request);
 
-        // Không có token → để SecurityEntryPoint xử lý 401 (đỡ duplicate logic)
         if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Check token bị revoke trong Redis
         if (redisService.isRevoked(jwt)) {
             writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED,
                     "unauthorized", "Token has been revoked");
@@ -59,7 +55,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Validate cơ bản: hết hạn / parse lỗi → cho EntryPoint xử lý 401
         try {
             Date exp = jwtService.extractExpiration(jwt);
             if (exp == null || exp.before(new Date())) {
@@ -73,15 +68,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Set Authentication nếu chưa có trong context
         try {
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 String username = jwtService.extractUsername(jwt);
                 if (username != null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                    // Nếu bạn có hàm jwtService.isValid(jwt, userDetails) thì mở dòng dưới:
-                    // if (!jwtService.isValid(jwt, userDetails)) { filterChain.doFilter(request, response); return; }
 
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
@@ -91,7 +82,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Bất kỳ lỗi nào khi parse/validate → trả 401 JSON
             writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED,
                     "unauthorized", "Invalid token");
             return;
@@ -108,7 +98,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 || uri.equals("/swagger-ui.html");
     }
 
-    /** Lấy JWT từ header Authorization theo chuẩn Bearer (case-insensitive) */
     private String resolveBearerToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header == null) return null;
@@ -119,7 +108,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    /** Viết lỗi JSON gọn cho Android */
     private void writeJsonError(HttpServletResponse response, int status, String error, String message) throws IOException {
         response.setStatus(status);
         response.setContentType("application/json");

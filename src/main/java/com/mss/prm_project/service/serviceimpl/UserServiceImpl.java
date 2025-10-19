@@ -38,4 +38,11 @@ public class UserServiceImpl implements UserService {
         user.setRole(role.get());
         return UserMapper.INSTANCE.userToUserDTO(userRepository.save(user));
     }
+
+    @Override
+    public UserDTO getUserByGoogleSub(String googleSub) throws Exception {
+        return userRepository.findByGoogleSub(googleSub)
+                .map(UserMapper.INSTANCE::userToUserDTO)
+                .orElseThrow(() -> new Exception("User Not Found"));
+    }
 }

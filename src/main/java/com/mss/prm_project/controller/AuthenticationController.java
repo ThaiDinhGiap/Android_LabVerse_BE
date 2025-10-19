@@ -69,7 +69,7 @@ public class AuthenticationController {
         String token = authHeader.substring(7);
         long userId = jwtService.extractUserId(token);
 
-        googleService.linkGoogleAccount(userId + 1, req);
+        googleService.linkGoogleAccount(userId, req);
         return ResponseEntity.noContent().build();
     }
 

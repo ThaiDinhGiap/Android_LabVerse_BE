@@ -3,6 +3,7 @@ package com.mss.prm_project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -36,8 +37,9 @@ public class Paper extends  BaseEntity {
     @Column(name = "publish_date")
     LocalDateTime publishDate;
 
-//    @Column(name = "page_number")
-//    int pageNumber;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    User user;
 
     @Column(name = "is_Offline")
     boolean isOffline;

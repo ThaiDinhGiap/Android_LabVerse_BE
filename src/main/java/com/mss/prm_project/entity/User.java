@@ -52,6 +52,9 @@ public class User extends BaseEntity implements UserDetails {
     Set<Collection> collections = new HashSet<>();
 
 
+    @OneToMany(mappedBy = "user")
+    List<Paper> paper;
+
     @Column(name = "enabled")
     boolean enabled;
 

@@ -12,9 +12,12 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(source = "role.roleId", target = "role")
+    @Mapping(source = "userId", target = "id")
+
     UserDTO userToUserDTO(User user);
 
     @Mapping(source = "role", target = "role")
+    @Mapping(source = "id", target = "userId")
     User userDTOToUser(UserDTO dto);
 
     default Role map(Long id) {

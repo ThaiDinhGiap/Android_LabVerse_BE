@@ -49,7 +49,7 @@ public class AuthGoogleServiceImpl implements AuthGoogleService {
         var dto = userService.getUserByGoogleSub(gp.sub());
         String accessToken  = jwtService.generateAcessToken(dto);
         String refreshToken = jwtService.generateRefreshToken(dto);
-        redisService.saveRefreshToken(dto.getId(), refreshToken, expirationOfRefreshToken);
+        redisService.saveRefreshToken(dto.getUserId(), refreshToken, expirationOfRefreshToken);
 
         // Log backend-side
 
@@ -74,7 +74,6 @@ public class AuthGoogleServiceImpl implements AuthGoogleService {
 
 
 
-//        long userId = currentUserId + 1;
         User me = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
 

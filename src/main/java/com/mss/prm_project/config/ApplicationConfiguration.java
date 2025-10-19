@@ -25,8 +25,6 @@ public class ApplicationConfiguration {
             return userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("Email not found"));
         };
-//        return username -> userRepository.findByUsername(username)
-//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean

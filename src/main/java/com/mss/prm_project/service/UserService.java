@@ -10,4 +10,6 @@ public interface UserService {
     Optional<UserDTO> getUserByEmail(String email);
     UserDTO createUser(User user);
     UserDTO getUserByGoogleSub(String sub) throws Exception;
+    boolean checkIfEmailExists(String email);
+    void updateEmailVerified(String email) throws Exception;
 }

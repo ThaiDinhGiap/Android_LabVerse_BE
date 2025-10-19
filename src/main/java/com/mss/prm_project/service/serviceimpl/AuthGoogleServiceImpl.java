@@ -49,7 +49,8 @@ public class AuthGoogleServiceImpl implements AuthGoogleService {
         var dto = userService.getUserByGoogleSub(gp.sub());
         String accessToken  = jwtService.generateAcessToken(dto);
         String refreshToken = jwtService.generateRefreshToken(dto);
-        redisService.saveRefreshToken(dto.getUserId(), refreshToken, expirationOfRefreshToken);
+//        redisService.saveRefreshToken(dto.getUserId(), refreshToken, expirationOfRefreshToken);
+        redisService.saveRefreshToken(dto.getId(), refreshToken, expirationOfRefreshToken);
 
         // Log backend-side
 

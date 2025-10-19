@@ -61,10 +61,10 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "google_sub", unique = true)
     private String googleSub;
 
-    @Column(name = "email_verify_at", updatable = false)
+    @Column(name = "email_verify_at")
     private LocalDateTime emailVerifyAt;
 
-    @Column(name = "google_link_at", updatable = false)
+    @Column(name = "google_link_at")
     private LocalDateTime googleLinkAt;
 
     @Override

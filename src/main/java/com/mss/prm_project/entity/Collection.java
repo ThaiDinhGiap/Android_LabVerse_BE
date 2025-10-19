@@ -35,11 +35,14 @@ public class Collection extends BaseEntity {
     )
     Set<Paper> papers = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "collection_members",
-            joinColumns = @JoinColumn(name = "collection_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    Set<User> users = new HashSet<>();
+//    @ManyToMany
+//    @JoinTable(
+//            name = "collection_members",
+//            joinColumns = @JoinColumn(name = "collection_id"),
+//            inverseJoinColumns = @JoinColumn(name = "user_id")
+//    )
+//    Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<CollectionMember> members = new HashSet<>();
 }

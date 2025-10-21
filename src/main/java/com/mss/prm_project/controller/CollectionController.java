@@ -79,4 +79,27 @@ public class CollectionController {
         );
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @DeleteMapping("/{collectionId}/papers/{paperId}")
+    public ResponseEntity<ResponseObject> removePaper(
+            @PathVariable int collectionId,
+            @PathVariable int paperId,
+            @AuthenticationPrincipal User user) { // Lấy thông tin User đang đăng nhập
+
+        String message = collectionService.removePaperFromCollection(collectionId, paperId, user);
+        return ResponseEntity.ok(
+                ResponseObject.builder().message(message).data(null).build()
+        );
+    }
+
+    @PutMapping("/{collectionId}/reject")
+    public ResponseEntity<Void> rejectInvitation(
+            @PathVariable int collectionId,
+            @AuthenticationPrincipal User user){
+        collectionService.rejectInvitation(
+                collectionId,
+                user
+        );
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

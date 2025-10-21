@@ -95,7 +95,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         return uri.startsWith("/api/auth/")
                 || uri.startsWith("/swagger-ui/")
                 || uri.startsWith("/v3/api-docs")
-                || uri.equals("/swagger-ui.html");
+                || uri.equals("/swagger-ui.html")
+                || uri.startsWith("/api/user/");
     }
 
     private String resolveBearerToken(HttpServletRequest request) {

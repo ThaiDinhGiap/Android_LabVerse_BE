@@ -22,4 +22,10 @@ public interface CollectionMemberRepository extends JpaRepository<CollectionMemb
     Optional<CollectionMember> findByCollectionCollectionIdAndUserUserIdAndRole(int collectionId, int userId, MemberRole role);
 
     Optional<CollectionMember> findByCollectionCollectionIdAndUserUserIdAndStatus(int collectionId, int userId, JoinStatus status);
+
+    boolean existsByCollectionCollectionIdAndUserUserIdAndStatusIsNot(
+            int collectionId,
+            Long userId,
+            CollectionMember.JoinStatus status
+    );
 }

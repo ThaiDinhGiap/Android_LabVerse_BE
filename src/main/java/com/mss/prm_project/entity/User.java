@@ -72,6 +72,12 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "google_link_at")
     private LocalDateTime googleLinkAt;
 
+    @Column(name = "push_notifications", columnDefinition = "boolean default true")
+    private boolean pushNotifications;
+
+    @Column(name = "email_notifications", columnDefinition = "boolean default true")
+    private boolean emailNotifications;
+
     @Override
     public java.util.Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase()));

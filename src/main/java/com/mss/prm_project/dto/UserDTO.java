@@ -15,4 +15,6 @@ public class UserDTO extends BaseDTO implements Serializable {
     private Boolean isEnabled;
     private Long role;
     private LocalDateTime emailVerifyAt;
+    private boolean pushNotification;
+    private boolean emailNotification;
 }

@@ -38,6 +38,7 @@ public interface PaperRepository extends JpaRepository<Paper, Long> {
                 @Param("author") String author,
                 @Param("journal") String journal,
                 @Param("priority") Integer priority,
+                @Param("publisher") String publisher,
                 @Param("date") LocalDate date,
                 @Param("fromDate") LocalDateTime fromDate,
                 @Param("toDate") LocalDateTime toDate

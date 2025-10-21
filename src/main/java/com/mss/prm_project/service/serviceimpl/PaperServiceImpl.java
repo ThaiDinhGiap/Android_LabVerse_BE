@@ -77,7 +77,7 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public List<PaperDTO> getPapers(String q, String author, String journal, Integer priority, String dateStr, String fromDateStr, String toDateStr) {
+    public List<PaperDTO> getPapers(String q, String author, String journal, Integer priority, String publisher, String dateStr, String fromDateStr, String toDateStr) {
         LocalDate dateFilter = (dateStr != null && !dateStr.isEmpty())
                 ? LocalDate.parse(dateStr) : null;
 
@@ -92,7 +92,7 @@ public class PaperServiceImpl implements PaperService {
             throw new IllegalArgumentException("fromDate must not be after toDate");
         }
 
-        List<Paper> papers = paperRepository.searchPapers(q, author, journal, priority, dateFilter, fromDateTime, toDateTime);
+        List<Paper> papers = paperRepository.searchPapers(q, author, journal, priority, publisher, dateFilter, fromDateTime, toDateTime);
         return papers.stream()
                 .map(PaperMapper.INSTANCE::toDTO)
                 .toList();

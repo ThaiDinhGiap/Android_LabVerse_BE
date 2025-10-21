@@ -17,6 +17,7 @@ import java.util.List;
                                  String author,
                                  String journal,
                                  Integer priority,
+                                 String publisher,
                                  String date,
                                  String fromDate,
                                  String toDate);

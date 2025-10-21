@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 
 @RestController
@@ -29,11 +30,12 @@ public class PaperController {
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String journal,
             @RequestParam(required = false) Integer priority,
+            @RequestParam(required = false) String publisher,
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String fromDate,
-            @RequestParam(required = false) String toDate
-    ) {
-        List<PaperDTO> results = paperService.getPapers(q, author, journal, priority, date, fromDate, toDate);
+            @RequestParam(required = false) String toDate,
+            Reader reader) {
+        List<PaperDTO> results = paperService.getPapers(q, author, journal, priority, publisher, date, fromDate, toDate);
         return ResponseEntity.ok(results);
     }
 

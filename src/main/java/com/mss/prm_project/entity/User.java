@@ -57,16 +57,19 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CollectionMember> memberOfCollections = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    List<Paper> paper;
+
     @Column(name = "enabled")
     boolean enabled;
 
     @Column(name = "google_sub", unique = true)
     private String googleSub;
 
-    @Column(name = "email_verify_at", updatable = false)
+    @Column(name = "email_verify_at")
     private LocalDateTime emailVerifyAt;
 
-    @Column(name = "google_link_at", updatable = false)
+    @Column(name = "google_link_at")
     private LocalDateTime googleLinkAt;
 
     @Override

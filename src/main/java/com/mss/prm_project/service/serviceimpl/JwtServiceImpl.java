@@ -42,8 +42,10 @@ public class JwtServiceImpl implements JwtService {
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
+//                .claim("id", user.getUserId())
                 .claim("id", user.getId())
                 .claim("roles", roleName)
+                .claim("email", user.getEmail())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiresAt)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -60,8 +62,10 @@ public class JwtServiceImpl implements JwtService {
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
+//                .claim("id", user.getUserId())
                 .claim("id", user.getId())
                 .claim("roles", roleName)
+                .claim("email", user.getEmail())
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiresAt)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -81,12 +85,53 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
+    public String extractEmail(String token) {
+        Claims claims = extractAllClaims(token);
+        if (claims != null) {
+            Date expiration = claims.getExpiration();
+            if (expiration.after(new Date())) {
+                return claims.get("email", String.class);
+            }
+        }
+        return null;
+    }
+
+
+    @Override
     public Date extractExpiration(String token) {
         Claims claims = extractAllClaims(token);
         if (claims != null) {
             return claims.getExpiration();
         }
         return null;
+    }
+
+    @Override
+    public String generateEmailVerifyToken(String email) throws Exception {
+        if (userRepository.findByEmail(email).isEmpty()) {
+            throw new Exception("User with email " + email + " does not exist.");
+        }
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
+    @Override
+    public String validateEmailVerifyToken(String token) throws Exception {
+        Claims claims = extractAllClaims(token);
+        if (claims == null) {
+            throw new Exception("Invalid token." );
+        }
+        Date expiration = claims.getExpiration();
+        if (expiration.before(new Date())) {
+            throw new Exception("Token has expired." );
+        }
+        return claims.getSubject();
     }
 
     @Override

@@ -2,10 +2,7 @@ package com.mss.prm_project.controller;
 
 import com.mss.prm_project.entity.User;
 import com.mss.prm_project.model.*;
-import com.mss.prm_project.service.AuthGoogleService;
-import com.mss.prm_project.service.AuthenticationService;
-import com.mss.prm_project.service.JwtService;
-import com.mss.prm_project.service.UserService;
+import com.mss.prm_project.service.*;
 import io.jsonwebtoken.Jwt;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +22,8 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final AuthGoogleService googleService;
     private final JwtService jwtService;
+    private final UserService userService;
+    private final MailService mailService;
 
 
     @PostMapping("/login")
@@ -69,10 +68,38 @@ public class AuthenticationController {
         String token = authHeader.substring(7);
         long userId = jwtService.extractUserId(token);
 
-        googleService.linkGoogleAccount(userId + 1, req);
+        googleService.linkGoogleAccount(userId, req);
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/verify-email")
+    public ResponseEntity<ApiResponse<String>> verifyEmail(@RequestBody VerifyEmailRequest request) throws Exception {
+        boolean emailExists = userService.checkIfEmailExists(request.getEmail());
+        if (!emailExists) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<String>builder().message("Email not found!").build());
+        }
+
+        String token = jwtService.generateEmailVerifyToken(request.getEmail());
+
+        mailService.sentVerifyMail(request.getEmail(), token);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<String>builder().message("Email verify link has been sent to your email").build());
+    }
+
+    @PostMapping("/email-verified")
+    public ResponseEntity<ApiResponse<String>> updateEmailVerified(@RequestBody ConfirmVerifyEmailRequest request) throws Exception {
+        String email = jwtService.validateEmailVerifyToken(request.getToken());
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<String>builder().message("Invalid or expired token!").build());
+        }
+        userService.updateEmailVerified(email);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<String>builder().message("Email successfully verified").build());
+    }
 
 
 

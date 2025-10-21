@@ -17,6 +17,9 @@ public class S3ServiceV2 {
     @Value("${aws.s3.bucketName}")
     private String bucketName;
 
+    @Value("${aws.s3.region}")
+    private String region;
+
     public S3ServiceV2(S3Client s3) {
         this.s3 = s3;
     }
@@ -27,10 +30,10 @@ public class S3ServiceV2 {
                 .bucket(bucketName)
                 .key(key)
                 .contentType(multipartFile.getContentType())
-                .contentLength(multipartFile.getSize())
                 .build();
         s3.putObject(putReq, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
-        return key;
+        String fileUrl = String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
+        return fileUrl;
     }
 
     public byte[] downloadFile(String key) {

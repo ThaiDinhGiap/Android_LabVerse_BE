@@ -15,5 +15,7 @@ public interface CollectionService {
     void inviteMember(int collectionID, String invitedEmail, User user);
     CollectionMember acceptInvitation(int collectionId, User currentUser);
     CollectionDetailResponse getCollectionDetails(int collectionId, User user);
+    String removePaperFromCollection(int collectionId, int paperId, User user);
+    void rejectInvitation(int collectionId, User user);
 
 }

@@ -32,7 +32,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/files/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/files/**", "/api/user/**").permitAll()
                         .requestMatchers("/api/papers/upload").authenticated()
                         .requestMatchers("/api/file/**").permitAll()
                         .requestMatchers("/api/collections/**").permitAll()

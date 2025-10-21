@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,10 +127,18 @@ public class CollectionServiceImpl implements CollectionService {
         User invitedUser = userRepository.findByEmail(invitedEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Tạo ID kết hợp để kiểm tra
+        // Tìm bản ghi CollectionMember nếu nó đang ở trạng thái KHÔNG PHẢI REJECTED.
+        boolean isAlreadyActiveOrPending = collectionMemberRepository
+                .existsByCollectionCollectionIdAndUserUserIdAndStatusIsNot(
+                        collectionID,
+                        (long) invitedUser.getUserId(),
+                        CollectionMember.JoinStatus.REJECTED
+                );
+
+        // Tạo ID kết hợp
         CollectionMemberId checkId = new CollectionMemberId(collectionID, invitedUser.getUserId());
 
-        if (collectionMemberRepository.findById(checkId).isPresent()) {
+        if (isAlreadyActiveOrPending) {
             throw new RuntimeException("User is already part of the collection or has a pending invitation.");
         }
 
@@ -146,22 +155,6 @@ public class CollectionServiceImpl implements CollectionService {
         collectionMember.setStatus(CollectionMember.JoinStatus.PENDING);
 
         collectionMemberRepository.save(collectionMember);
-    }
-    @Transactional
-    @Override
-    public CollectionMember acceptInvitation(int collectionId, User currentUser) {
-
-        CollectionMember member = collectionMemberRepository
-                .findByCollectionCollectionIdAndUserUserIdAndStatus(
-                        collectionId,
-                        currentUser.getUserId(),
-                        CollectionMember.JoinStatus.PENDING
-                )
-                .orElseThrow(() -> new RuntimeException("Invitation not found or already accepted/rejected."));
-
-        member.setStatus(CollectionMember.JoinStatus.JOINED);
-
-        return collectionMemberRepository.save(member);
     }
 
     @Transactional(readOnly = true)
@@ -204,5 +197,79 @@ public class CollectionServiceImpl implements CollectionService {
         collectionDetailResponse.setMembers(memberResponses);
 
         return collectionDetailResponse;
+    }
+
+    @Transactional
+    @Override
+    public String removePaperFromCollection(int collectionId, int paperId, User user) {
+        // 1. Kiểm tra Collection và Paper có tồn tại không
+        Collection collection = collectionRepository.findById((long) collectionId)
+                .orElseThrow(() -> new RuntimeException("Collection not found.")); // **NÊN dùng ResourceNotFoundException (404)**
+
+        Paper paper = paperRepository.findById((long) paperId)
+                .orElseThrow(() -> new RuntimeException("Paper not found.")); // **NÊN dùng ResourceNotFoundException (404)**
+
+        // 2. Kiểm tra quyền (Chỉ Owner hoặc PI mới được xóa paper)
+        boolean isOwner = Objects.equals(collection.getOwnerUser().getUserId(), user.getUserId());
+        if (!isOwner) {
+            collectionMemberRepository
+                    .findByCollectionCollectionIdAndUserUserIdAndRole(collectionId, user.getUserId(), CollectionMember.MemberRole.PI)
+                    .orElseThrow(() -> new RuntimeException("Permission denied. Only the Collection Owner or PI can remove papers.")); // **NÊN dùng AccessDeniedException (403)**
+        }
+
+        // 3. Xóa Paper khỏi Collection
+        if (collection.getPapers().remove(paper)) {
+            // Lưu Collection sẽ tự động cập nhật bảng liên kết (collection_papers)
+            collectionRepository.save(collection);
+            return "Paper (ID: " + paperId + ") successfully removed from collection (ID: " + collectionId + ").";
+        } else {
+            throw new RuntimeException("Paper is not currently in this collection."); // **NÊN dùng BadRequestException (400)**
+        }
+    }
+
+    @Transactional
+    @Override
+    public CollectionMember acceptInvitation(int collectionId, User currentUser) {
+
+        CollectionMember member = collectionMemberRepository
+                .findByCollectionCollectionIdAndUserUserIdAndStatus(
+                        collectionId,
+                        currentUser.getUserId(),
+                        CollectionMember.JoinStatus.PENDING
+                )
+                .orElseThrow(() -> new RuntimeException("Invitation not found or already accepted/rejected."));
+
+        member.setStatus(CollectionMember.JoinStatus.JOINED);
+
+        return collectionMemberRepository.save(member);
+    }
+
+    @Transactional
+    @Override
+    public void rejectInvitation(int collectionId, User user) {
+
+        // 1. Tạo ID khóa kết hợp
+        CollectionMemberId id = new CollectionMemberId(collectionId, user.getUserId());
+
+        // 2. Tìm bản ghi CollectionMember và kiểm tra người nhận
+        CollectionMember member = collectionMemberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Invitation not found for this collection."));
+
+        // 3. Kiểm tra trạng thái phải là PENDING
+        if (member.getStatus() != CollectionMember.JoinStatus.PENDING) {
+            throw new RuntimeException("Cannot reject. This invitation is not pending. Current status is " + member.getStatus());
+        }
+
+        // 4. Kiểm tra người dùng (Đã được kiểm tra ngầm qua ID, nhưng đảm bảo tính bảo mật)
+        if (!Objects.equals(member.getUser().getUserId(), user.getUserId())) {
+            throw new RuntimeException("Unauthorized access to reject this invitation.");
+        }
+
+        // 5. Cập nhật trạng thái thành REJECTED
+        member.setStatus(CollectionMember.JoinStatus.REJECTED);
+        collectionMemberRepository.save(member);
+
+        // *Lưu ý: Nếu bạn muốn xóa hẳn lời mời bị từ chối khỏi database, hãy dùng:
+        // collectionMemberRepository.delete(member);
     }
 }

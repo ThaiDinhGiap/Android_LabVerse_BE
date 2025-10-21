@@ -23,6 +23,20 @@ public class PaperController {
         this.paperService = paperService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<PaperDTO>> searchPapers(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String journal,
+            @RequestParam(required = false) Integer priority,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate
+    ) {
+        List<PaperDTO> results = paperService.getPapers(q, author, journal, priority, date, fromDate, toDate);
+        return ResponseEntity.ok(results);
+    }
+
     @GetMapping("/newest-unread")
     public ResponseEntity<List<Paper>> getNewestUnread(@RequestParam int userId) {
         List<Paper> papers = paperService.getTop10NewestUnreadPapers(userId);

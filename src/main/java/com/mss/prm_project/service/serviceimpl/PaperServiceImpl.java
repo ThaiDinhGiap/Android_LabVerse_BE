@@ -20,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,4 +75,28 @@ public class PaperServiceImpl implements PaperService {
         fileRepository.save(savedfile);
         return PaperMapper.INSTANCE.toDTO(savedPaper);
     }
+
+    @Override
+    public List<PaperDTO> getPapers(String q, String author, String journal, Integer priority, String dateStr, String fromDateStr, String toDateStr) {
+        LocalDate dateFilter = (dateStr != null && !dateStr.isEmpty())
+                ? LocalDate.parse(dateStr) : null;
+
+        LocalDateTime fromDateTime = (fromDateStr != null && !fromDateStr.isEmpty())
+                ? LocalDate.parse(fromDateStr).atStartOfDay()
+                : null;
+        LocalDateTime toDateTime = (toDateStr != null && !toDateStr.isEmpty())
+                ? LocalDate.parse(toDateStr).atTime(LocalTime.MAX)
+                : null;
+
+        if (fromDateTime != null && toDateTime != null && fromDateTime.isAfter(toDateTime)) {
+            throw new IllegalArgumentException("fromDate must not be after toDate");
+        }
+
+        List<Paper> papers = paperRepository.searchPapers(q, author, journal, priority, dateFilter, fromDateTime, toDateTime);
+        return papers.stream()
+                .map(PaperMapper.INSTANCE::toDTO)
+                .toList();
+    }
+
+
 }

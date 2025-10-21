@@ -115,37 +115,38 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public void inviteMember(int collectionID, String invitedEmail, User user) {
 
+        // 1. Kiểm tra Quyền (Người mời phải là PI)
         collectionMemberRepository
                 .findByCollectionCollectionIdAndUserUserIdAndRole(collectionID, user.getUserId(), CollectionMember.MemberRole.PI)
                 .orElseThrow(() -> new RuntimeException("Permission denied. Only the PI can invite member of this collection."));
 
-        Collection collection =  collectionRepository.findById((long) collectionID)
+        Collection collection = collectionRepository.findById((long) collectionID)
                 .orElseThrow(() -> new RuntimeException("Collection not found"));
+
         User invitedUser = userRepository.findByEmail(invitedEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // kiem tra duplicate
-        if (collectionMemberRepository
-                .findByCollectionCollectionIdAndUserUserId(collectionID, user.getUserId())
-                .isPresent()) {
+        // Tạo ID kết hợp để kiểm tra
+        CollectionMemberId checkId = new CollectionMemberId(collectionID, invitedUser.getUserId());
+
+        if (collectionMemberRepository.findById(checkId).isPresent()) {
             throw new RuntimeException("User is already part of the collection or has a pending invitation.");
         }
 
-        // them thanh vien (pending)
+        // 3. Tạo đối tượng CollectionMemberId cho invitedUser
         CollectionMember collectionMember = new CollectionMember();
 
-        CollectionMemberId  collectionMemberId = new CollectionMemberId(collection.getCollectionId(), user.getUserId());
-        collectionMember.setId(collectionMemberId);
+        // Sử dụng checkId đã tạo
+        collectionMember.setId(checkId);
 
         collectionMember.setCollection(collection);
-        collectionMember.setUser(invitedUser);
+        collectionMember.setUser(invitedUser); // Thiết lập mối quan hệ với người được mời
 
         collectionMember.setRole(CollectionMember.MemberRole.MEMBER);
         collectionMember.setStatus(CollectionMember.JoinStatus.PENDING);
 
         collectionMemberRepository.save(collectionMember);
     }
-
     @Transactional
     @Override
     public CollectionMember acceptInvitation(int collectionId, User currentUser) {

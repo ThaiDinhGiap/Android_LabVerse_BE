@@ -1,5 +1,8 @@
 package com.mss.prm_project.service;
 
+import com.mss.prm_project.dto.PasswordChangeDTO;
+import com.mss.prm_project.dto.ProfileDTO;
+import com.mss.prm_project.dto.SettingDTO;
 import com.mss.prm_project.dto.UserDTO;
 import com.mss.prm_project.entity.User;
 
@@ -12,4 +15,8 @@ public interface UserService {
     UserDTO getUserByGoogleSub(String sub) throws Exception;
     boolean checkIfEmailExists(String email);
     void updateEmailVerified(String email) throws Exception;
+    ProfileDTO getUserProfileByUsername(String username) throws Exception;
+    boolean updateUserPassword(PasswordChangeDTO passwordChangeDTO);
+    boolean updateNotificationPreferences(SettingDTO settingDTO);
+    ProfileDTO updateProfile(ProfileDTO profileDTO);
 }

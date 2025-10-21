@@ -1,5 +1,8 @@
 package com.mss.prm_project.service.serviceimpl;
 
+import com.mss.prm_project.dto.PasswordChangeDTO;
+import com.mss.prm_project.dto.ProfileDTO;
+import com.mss.prm_project.dto.SettingDTO;
 import com.mss.prm_project.dto.UserDTO;
 import com.mss.prm_project.entity.Role;
 import com.mss.prm_project.entity.User;
@@ -7,6 +10,8 @@ import com.mss.prm_project.mapper.UserMapper;
 import com.mss.prm_project.repository.RoleRepository;
 import com.mss.prm_project.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.mss.prm_project.repository.UserRepository;
 
@@ -19,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDTO getUserById(Long userId) throws Exception {
@@ -59,5 +65,48 @@ public class UserServiceImpl implements UserService {
 
         user.setEmailVerifyAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    @Override
+    public ProfileDTO getUserProfileByUsername(String username) throws Exception {
+        User user = userRepository.findByUsername(username).get();
+        ProfileDTO profileDTO = new ProfileDTO();
+        profileDTO.setName(user.getFullName());
+        profileDTO.setEmailNotifications(user.isEmailNotifications());
+        profileDTO.setPushNotifications(user.isPushNotifications());
+        return profileDTO;
+    }
+
+    @Override
+    public boolean updateUserPassword(PasswordChangeDTO passwordChangeDTO) {
+        try {
+            User user = userRepository.findByUsername(passwordChangeDTO.getUserName()).get();
+            user.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
+            userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateNotificationPreferences(SettingDTO settingDTO) {
+        try {
+            User user = userRepository.findByUsername(settingDTO.getUserName()).get();
+            user.setEmailNotifications(settingDTO.isEmailNotifications());
+            user.setPushNotifications(settingDTO.isPushNotifications());
+            userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public ProfileDTO updateProfile(ProfileDTO profileDTO) {
+        User user = userRepository.findByUsername(profileDTO.getUserName()).get();
+        user.setFullName(profileDTO.getName());
+        userRepository.save(user);
+        return profileDTO;
     }
 }

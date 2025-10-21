@@ -14,4 +14,6 @@ public class UserDTO extends BaseDTO implements Serializable {
     private String username;
     private Boolean isEnabled;
     private Long role;
+    private boolean pushNotification;
+    private boolean emailNotification;
 }

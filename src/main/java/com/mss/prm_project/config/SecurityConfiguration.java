@@ -35,6 +35,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/auth/**", "/api/files/**").permitAll()
                         .requestMatchers("/api/papers/upload").authenticated()
                         .requestMatchers("/api/file/**").permitAll()
+                        .requestMatchers("/api/collections/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)

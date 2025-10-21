@@ -48,9 +48,14 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     Role role;
 
-    @ManyToMany(mappedBy = "users")
-    Set<Collection> collections = new HashSet<>();
+//    @ManyToMany(mappedBy = "users")
+//    Set<Collection> collections = new HashSet<>();
 
+    @OneToMany(mappedBy = "ownerUser")
+    private Set<Collection> ownedCollections = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CollectionMember> memberOfCollections = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     List<Paper> paper;

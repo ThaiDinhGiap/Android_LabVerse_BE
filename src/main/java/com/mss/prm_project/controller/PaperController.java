@@ -3,6 +3,7 @@ package com.mss.prm_project.controller;
 import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.service.PaperService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +14,10 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/papers")
 public class PaperController {
-
     private final PaperService paperService;
-
-    @Autowired
-    public PaperController(PaperService paperService) {
-        this.paperService = paperService;
-    }
 
     @GetMapping("/newest-unread")
     public ResponseEntity<List<Paper>> getNewestUnread(@RequestParam int userId) {

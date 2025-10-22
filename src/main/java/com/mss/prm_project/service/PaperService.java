@@ -20,4 +20,10 @@ public interface PaperService {
 
     FavoritePaperDTO addtoFavoritePapers(long userId, long paperId);
 
+    boolean deletePaper(long paperId);
+
+    boolean deleteFavoritePaper(long paperId, long userId);
+
+    PaperDTO findByPaperId(long paperId);
+
 }

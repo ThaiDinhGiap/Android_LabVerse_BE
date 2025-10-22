@@ -1,5 +1,6 @@
 package com.mss.prm_project.controller;
 
+import com.mss.prm_project.dto.FavoritePaperDTO;
 import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.service.PaperService;
@@ -34,6 +35,12 @@ public class PaperController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PaperDTO> uploadPaper(@RequestPart("dto") PaperDTO dto,  @RequestParam("file") MultipartFile file) throws IOException {
         PaperDTO result = paperService.insertPaper(dto, file);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping( "/add-to-favourite")
+    public ResponseEntity<FavoritePaperDTO> addToFavoritePapers(@RequestParam("userId") long userId , @RequestParam("paperId") long paperId ) {
+        FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
         return ResponseEntity.ok(result);
     }
 }

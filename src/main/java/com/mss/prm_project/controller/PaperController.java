@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +36,12 @@ public class PaperController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PaperDTO> uploadPaper(@RequestPart("dto") PaperDTO dto,  @RequestParam("file") MultipartFile file) throws IOException {
+        public ResponseEntity<PaperDTO> uploadPaper(@RequestPart("dto") PaperDTO dto, @RequestParam("publishDate") String publishDate, @RequestParam("file") MultipartFile file) throws IOException {
+        if(Objects.isNull(dto.getPriority())) {
+            dto.setPriority(1);
+        }
+        LocalDateTime localDateTime = LocalDateTime.parse(publishDate);
+        dto.setPublishDate(localDateTime);
         PaperDTO result = paperService.insertPaper(dto, file);
         return ResponseEntity.ok(result);
     }

@@ -16,7 +16,7 @@ public interface PaperService {
 
      PaperDTO insertPaper(PaperDTO dto, MultipartFile file) throws IOException;
 
-     List<PaperDTO> getPaperByPriority(long userId, int priority);
+     List<PaperDTO> getPaperByPriority(long collectionid ,int priority);
 
     FavoritePaperDTO addtoFavoritePapers(long userId, long paperId);
 

@@ -17,4 +17,5 @@ public class UserDTO extends BaseDTO implements Serializable {
     private LocalDateTime emailVerifyAt;
     private boolean pushNotification;
     private boolean emailNotification;
+    private String fcmToken;
 }

@@ -78,6 +78,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "email_notifications", columnDefinition = "boolean default true")
     private boolean emailNotifications;
 
+    @Column(name = "fcm_token", columnDefinition = "nvarchar(512)")
+    private String fcmToken;
+
     @Override
     public java.util.Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase()));

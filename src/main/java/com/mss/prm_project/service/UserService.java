@@ -1,5 +1,6 @@
 package com.mss.prm_project.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.mss.prm_project.dto.PasswordChangeDTO;
 import com.mss.prm_project.dto.ProfileDTO;
 import com.mss.prm_project.dto.SettingDTO;
@@ -19,4 +20,5 @@ public interface UserService {
     boolean updateUserPassword(PasswordChangeDTO passwordChangeDTO);
     boolean updateNotificationPreferences(SettingDTO settingDTO);
     ProfileDTO updateProfile(ProfileDTO profileDTO);
+    void updateFcmToken(String username, String fcmToken) throws FirebaseMessagingException;
 }

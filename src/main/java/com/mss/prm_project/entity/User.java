@@ -48,9 +48,14 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     Role role;
 
-    @ManyToMany(mappedBy = "users")
-    Set<Collection> collections = new HashSet<>();
+//    @ManyToMany(mappedBy = "users")
+//    Set<Collection> collections = new HashSet<>();
 
+    @OneToMany(mappedBy = "ownerUser")
+    private Set<Collection> ownedCollections = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CollectionMember> memberOfCollections = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     List<Paper> paper;
@@ -61,11 +66,20 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "google_sub", unique = true)
     private String googleSub;
 
-    @Column(name = "email_verify_at", updatable = false)
+    @Column(name = "email_verify_at")
     private LocalDateTime emailVerifyAt;
 
-    @Column(name = "google_link_at", updatable = false)
+    @Column(name = "google_link_at")
     private LocalDateTime googleLinkAt;
+
+    @Column(name = "push_notifications", columnDefinition = "boolean default true")
+    private boolean pushNotifications;
+
+    @Column(name = "email_notifications", columnDefinition = "boolean default true")
+    private boolean emailNotifications;
+
+    @Column(name = "fcm_token", columnDefinition = "nvarchar(512)")
+    private String fcmToken;
 
     @Override
     public java.util.Collection<? extends GrantedAuthority> getAuthorities() {

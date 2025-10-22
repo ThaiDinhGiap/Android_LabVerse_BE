@@ -13,11 +13,12 @@ public interface UserMapper {
 
     @Mapping(source = "role.roleId", target = "role")
     @Mapping(source = "userId", target = "id")
-
+    @Mapping(source = "emailVerifyAt", target = "emailVerifyAt")
     UserDTO userToUserDTO(User user);
 
     @Mapping(source = "role", target = "role")
     @Mapping(source = "id", target = "userId")
+    @Mapping(source = "emailVerifyAt", target = "emailVerifyAt")
     User userDTOToUser(UserDTO dto);
 
     default Role map(Long id) {

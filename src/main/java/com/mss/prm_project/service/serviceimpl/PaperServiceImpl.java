@@ -1,12 +1,17 @@
 package com.mss.prm_project.service.serviceimpl;
 
+import com.mss.prm_project.dto.FavoritePaperDTO;
 import com.mss.prm_project.dto.FileDTO;
 import com.mss.prm_project.dto.PaperDTO;
+import com.mss.prm_project.entity.FavoritePaper;
 import com.mss.prm_project.entity.File;
 import com.mss.prm_project.entity.Paper;
+import com.mss.prm_project.entity.User;
+import com.mss.prm_project.mapper.FavouriteMapper;
 import com.mss.prm_project.mapper.FileMapper;
 import com.mss.prm_project.mapper.PaperMapper;
 import com.mss.prm_project.mapper.UserMapper;
+import com.mss.prm_project.repository.FavoritePaperRepository;
 import com.mss.prm_project.repository.FileRepository;
 import com.mss.prm_project.repository.PaperRepository;
 import com.mss.prm_project.repository.UserRepository;
@@ -31,6 +36,7 @@ public class PaperServiceImpl implements PaperService {
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
     private final S3ServiceV2 s3ServiceV2;
+    private final FavoritePaperRepository favoritePaperRepository;
 
     @Override
     public List<Paper> getTop10NewestUnreadPapers(int userId) {
@@ -72,5 +78,27 @@ public class PaperServiceImpl implements PaperService {
         savedfile.setPaper(savedPaper);
         fileRepository.save(savedfile);
         return PaperMapper.INSTANCE.toDTO(savedPaper);
+    }
+
+    @Override
+    public List<PaperDTO> getPaperByPriority(long userId, int priority) {
+        List<PaperDTO> resultList = new ArrayList<>();
+        if (userRepository.existsById(userId)) {
+        }
+        return null;
+    }
+
+    @Override
+    public FavoritePaperDTO addtoFavoritePapers(long userId, long paperId) {
+        User user = userRepository.findById(userId).orElseThrow(null);
+        Paper paper = paperRepository.findById(paperId).orElseThrow(null);
+        if (user == null || paper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or Paper not found");
+        }
+        FavoritePaper favoritePaper = new FavoritePaper();
+        favoritePaper.setUser(user);
+        favoritePaper.setPaper(paper);
+        FavoritePaper savedfavoritePaper = favoritePaperRepository.save(favoritePaper);
+        return FavouriteMapper.INSTANCE.toDTO(savedfavoritePaper);
     }
 }

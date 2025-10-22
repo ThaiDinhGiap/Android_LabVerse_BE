@@ -8,7 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -35,11 +36,14 @@ public class Collection extends BaseEntity {
     )
     Set<Paper> papers = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "collection_members",
-            joinColumns = @JoinColumn(name = "collection_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    Set<User> users = new HashSet<>();
+//    @ManyToMany
+//    @JoinTable(
+//            name = "collection_members",
+//            joinColumns = @JoinColumn(name = "collection_id"),
+//            inverseJoinColumns = @JoinColumn(name = "user_id")
+//    )
+//    Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<CollectionMember> members = new HashSet<>();
 }

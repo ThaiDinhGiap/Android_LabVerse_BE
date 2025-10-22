@@ -36,32 +36,34 @@ public class AuthGoogleServiceImpl implements AuthGoogleService {
         if (gpOpt.isEmpty() || !gpOpt.get().emailVerified()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Google token");
         }
+
         var gp = gpOpt.get();
 
-        User user = userRepository.findByGoogleSub(gp.sub())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Need to link Google account"));
+        var userDtoOpt = userService.getUserByGoogleSub(gp.sub());
+        if (userDtoOpt == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Need to link Google account");
+        }
 
-        if (user.getEmailVerifyAt() == null) {
+
+        if (userDtoOpt.getEmailVerifyAt() == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED");
         }
 
-        var dto = userService.getUserByGoogleSub(gp.sub());
-        String accessToken  = jwtService.generateAcessToken(dto);
-        String refreshToken = jwtService.generateRefreshToken(dto);
-        redisService.saveRefreshToken(dto.getUserId(), refreshToken, expirationOfRefreshToken);
+        String accessToken  = jwtService.generateAcessToken(userDtoOpt);
+        String refreshToken = jwtService.generateRefreshToken(userDtoOpt);
 
-        // Log backend-side
+        redisService.saveRefreshToken(userDtoOpt.getId(), refreshToken, expirationOfRefreshToken);
 
         return ApiResponse.<AuthenticationResponse>builder()
                 .message("Login successfully!")
                 .result(AuthenticationResponse.builder()
-                        .userDTO(dto)
+                        .userDTO(userDtoOpt)
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build())
                 .build();
     }
+
 
 
 

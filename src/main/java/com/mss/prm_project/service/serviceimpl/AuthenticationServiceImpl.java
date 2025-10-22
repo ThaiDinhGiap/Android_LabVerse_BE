@@ -55,7 +55,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var dto = dtoOpt.get();
         String accessToken  = jwtService.generateAcessToken(dto);
         String refreshToken = jwtService.generateRefreshToken(dto);
-        redisService.saveRefreshToken(dto.getUserId(), refreshToken, expirationOfRefreshToken);
+//        redisService.saveRefreshToken(dto.getUserId(), refreshToken, expirationOfRefreshToken);
+        redisService.saveRefreshToken(dto.getId(), refreshToken, expirationOfRefreshToken);
 
         return ApiResponse.<AuthenticationResponse>builder()
                 .message("Login successfully!")

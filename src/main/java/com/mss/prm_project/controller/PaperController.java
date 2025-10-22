@@ -33,8 +33,7 @@ public class PaperController {
             @RequestParam(required = false) String publisher,
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String fromDate,
-            @RequestParam(required = false) String toDate,
-            Reader reader) {
+            @RequestParam(required = false) String toDate) {
         List<PaperDTO> results = paperService.getPapers(q, author, journal, priority, publisher, date, fromDate, toDate);
         return ResponseEntity.ok(results);
     }

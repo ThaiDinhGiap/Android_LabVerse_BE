@@ -1,5 +1,6 @@
 package com.mss.prm_project.service.serviceimpl;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.mss.prm_project.dto.PasswordChangeDTO;
 import com.mss.prm_project.dto.ProfileDTO;
 import com.mss.prm_project.dto.SettingDTO;
@@ -8,6 +9,7 @@ import com.mss.prm_project.entity.Role;
 import com.mss.prm_project.entity.User;
 import com.mss.prm_project.mapper.UserMapper;
 import com.mss.prm_project.repository.RoleRepository;
+import com.mss.prm_project.service.FcmService;
 import com.mss.prm_project.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FcmService fcmService;
 
     @Override
     public UserDTO getUserById(Long userId) throws Exception {
@@ -108,5 +111,13 @@ public class UserServiceImpl implements UserService {
         user.setFullName(profileDTO.getName());
         userRepository.save(user);
         return profileDTO;
+    }
+
+    @Override
+    public void updateFcmToken(String username, String fcmToken) throws FirebaseMessagingException {
+        User user = userRepository.findByUsername(username).get();
+        user.setFcmToken(fcmToken);
+        fcmService.sendNotificationToToken(fcmToken, "FCM Token Updated", "Your FCM token has been successfully updated.");
+        userRepository.save(user);
     }
 }

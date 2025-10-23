@@ -23,6 +23,12 @@ import java.util.Objects;
 public class PaperController {
     private final PaperService paperService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PaperDTO> getPaperDetail(@PathVariable("id") int id) {
+        PaperDTO papers = paperService.findByPaperId(id);
+        return ResponseEntity.ok(papers);
+    }
+
     @GetMapping("/newest-unread")
     public ResponseEntity<List<Paper>> getNewestUnread(@RequestParam int userId) {
         List<Paper> papers = paperService.getTop10NewestUnreadPapers(userId);

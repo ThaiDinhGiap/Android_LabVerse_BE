@@ -102,4 +102,30 @@ public class PaperServiceImpl implements PaperService {
         FavoritePaper savedfavoritePaper = favoritePaperRepository.save(favoritePaper);
         return FavouriteMapper.INSTANCE.toDTO(savedfavoritePaper);
     }
+
+    @Override
+    public boolean deletePaper(long paperId) {
+        Paper paper = paperRepository.findById(paperId).orElseThrow(null);
+        if (paper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found");
+        }
+        paperRepository.delete(paper);
+        return true;
+    }
+
+    @Override
+    public boolean deleteFavoritePaper(long paperId, long userId) {
+        Paper paper = favoritePaperRepository.findByUserUserIdAndPaperPaperId(userId, paperId).getPaper();
+        if (paper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found");
+        }
+        paperRepository.delete(paper);
+        return true;
+    }
+
+    @Override
+    public PaperDTO findByPaperId(long paperId) {
+        Paper paper = paperRepository.findById(paperId).orElseThrow(null);
+        return PaperMapper.INSTANCE.toDTO(paper);
+    }
 }

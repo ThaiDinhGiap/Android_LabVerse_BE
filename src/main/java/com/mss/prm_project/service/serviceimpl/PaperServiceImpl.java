@@ -3,18 +3,12 @@ package com.mss.prm_project.service.serviceimpl;
 import com.mss.prm_project.dto.FavoritePaperDTO;
 import com.mss.prm_project.dto.FileDTO;
 import com.mss.prm_project.dto.PaperDTO;
-import com.mss.prm_project.entity.FavoritePaper;
-import com.mss.prm_project.entity.File;
-import com.mss.prm_project.entity.Paper;
-import com.mss.prm_project.entity.User;
+import com.mss.prm_project.entity.*;
 import com.mss.prm_project.mapper.FavouriteMapper;
 import com.mss.prm_project.mapper.FileMapper;
 import com.mss.prm_project.mapper.PaperMapper;
 import com.mss.prm_project.mapper.UserMapper;
-import com.mss.prm_project.repository.FavoritePaperRepository;
-import com.mss.prm_project.repository.FileRepository;
-import com.mss.prm_project.repository.PaperRepository;
-import com.mss.prm_project.repository.UserRepository;
+import com.mss.prm_project.repository.*;
 import com.mss.prm_project.service.PaperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +22,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +33,7 @@ public class PaperServiceImpl implements PaperService {
     private final FileRepository fileRepository;
     private final S3ServiceV2 s3ServiceV2;
     private final FavoritePaperRepository favoritePaperRepository;
+    private final CollectionRepository collectionRepository;
 
     @Override
     public List<Paper> getTop10NewestUnreadPapers(int userId) {
@@ -81,12 +78,16 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public List<PaperDTO> getPaperByPriority(long userId, int priority) {
-        List<PaperDTO> resultList = new ArrayList<>();
-        if (userRepository.existsById(userId)) {
+    public List<PaperDTO> getPaperByPriority(long collectionid, int priority) {
+        Collection collection = collectionRepository.findById(collectionid).get();
+        Set<Paper> paperList = collection.getPapers();
+        if(Objects.isNull(priority)){
+            return paperList.stream().map(PaperMapper.INSTANCE::toDTO).toList();
+        }else{
+            return null;
         }
-        return null;
     }
+
 
     @Override
     public FavoritePaperDTO addtoFavoritePapers(long userId, long paperId) {
@@ -100,5 +101,31 @@ public class PaperServiceImpl implements PaperService {
         favoritePaper.setPaper(paper);
         FavoritePaper savedfavoritePaper = favoritePaperRepository.save(favoritePaper);
         return FavouriteMapper.INSTANCE.toDTO(savedfavoritePaper);
+    }
+
+    @Override
+    public boolean deletePaper(long paperId) {
+        Paper paper = paperRepository.findById(paperId).orElseThrow(null);
+        if (paper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found");
+        }
+        paperRepository.delete(paper);
+        return true;
+    }
+
+    @Override
+    public boolean deleteFavoritePaper(long paperId, long userId) {
+        Paper paper = favoritePaperRepository.findByUserUserIdAndPaperPaperId(userId, paperId).getPaper();
+        if (paper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found");
+        }
+        paperRepository.delete(paper);
+        return true;
+    }
+
+    @Override
+    public PaperDTO findByPaperId(long paperId) {
+        Paper paper = paperRepository.findById(paperId).orElseThrow(null);
+        return PaperMapper.INSTANCE.toDTO(paper);
     }
 }

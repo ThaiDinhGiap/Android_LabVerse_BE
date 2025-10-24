@@ -1,9 +1,11 @@
 package com.mss.prm_project.controller;
 
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.mss.prm_project.entity.User;
 import com.mss.prm_project.model.*;
 import com.mss.prm_project.service.CollectionService;
+import com.mss.prm_project.service.FcmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.List;
 public class CollectionController {
 
     private final CollectionService collectionService;
+    private final FcmService fcmService;
 
     @PostMapping
     public ResponseEntity<CollectionResponse> createCollection(
@@ -84,9 +87,10 @@ public class CollectionController {
     public ResponseEntity<ResponseObject> removePaper(
             @PathVariable int collectionId,
             @PathVariable int paperId,
-            @AuthenticationPrincipal User user) { // Lấy thông tin User đang đăng nhập
+            @AuthenticationPrincipal User user) throws FirebaseMessagingException { // Lấy thông tin User đang đăng nhập
 
         String message = collectionService.removePaperFromCollection(collectionId, paperId, user);
+        fcmService.sendNotificationToToken(user.getFcmToken(), "Title", "Body");
         return ResponseEntity.ok(
                 ResponseObject.builder().message(message).data(null).build()
         );
@@ -95,11 +99,12 @@ public class CollectionController {
     @PutMapping("/{collectionId}/reject")
     public ResponseEntity<Void> rejectInvitation(
             @PathVariable int collectionId,
-            @AuthenticationPrincipal User user){
+            @AuthenticationPrincipal User user) throws FirebaseMessagingException {
         collectionService.rejectInvitation(
                 collectionId,
                 user
         );
+        fcmService.sendNotificationToToken(user.getFcmToken(), "Title", "Body");
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

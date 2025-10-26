@@ -51,12 +51,31 @@ public class S3ServiceV2 {
         }
     }
 
-    public void deleteFile(String key) {
+    public void deleteFile(String url) {
+        String filekey = this.extractFileKeyFromUrl(url);
         DeleteObjectRequest delReq = DeleteObjectRequest.builder()
                 .bucket(bucketName)
-                .key(key)
+                .key(filekey)
                 .build();
         s3.deleteObject(delReq);
+    }
+
+    private String extractFileKeyFromUrl(String fileUrl) {
+        String bucketName = "prm392-labverse";
+        String marker = bucketName + ".s3.";
+
+        int markerIndex = fileUrl.indexOf(marker);
+        if (markerIndex == -1) {
+            throw new IllegalArgumentException("Invalid S3 URL: missing bucket name");
+        }
+
+        // Tìm vị trí dấu "/" đầu tiên sau phần domain của S3
+        int startIndex = fileUrl.indexOf("/", markerIndex);
+        if (startIndex == -1 || startIndex + 1 >= fileUrl.length()) {
+            throw new IllegalArgumentException("Invalid S3 URL: missing file key");
+        }
+
+        return fileUrl.substring(startIndex + 1);
     }
 
     public String getBucketName() {

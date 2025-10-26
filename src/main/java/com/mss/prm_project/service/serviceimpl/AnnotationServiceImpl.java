@@ -73,15 +73,21 @@ public class AnnotationServiceImpl implements AnnotationService {
 
     @Override
     public AnnotationDTO createAnnotation(String annotationName, MultipartFile multipartFile, int paperId, int userId) throws IOException {
-        Annotation annotation = new Annotation();
-        annotation.setAnnotationName(annotationName);
-//        annotation.setAnnotationUrl(s3ServiceV2.uploadFile(multipartFile));
-        annotation.setAnnotationUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
-        User user = userRepository.findById((long) userId).get();
-        annotation.setOwner(user);
-        annotation.setReaders(new HashSet<>(Arrays.asList(user)));
-        Paper paper = paperRepository.findById((long) paperId).get();
-        annotation.setPaper(paper);
+        Annotation annotation = annotationRepository.findByPaperPaperIdAndOwnerUserId(paperId, userId);
+        if(Objects.nonNull(annotation)) {
+            s3ServiceV2.deleteFile(annotation.getAnnotationUrl());
+            annotation.setAnnotationUrl(s3ServiceV2.uploadFile(multipartFile));
+        }else{
+            annotation = new Annotation();
+            annotation.setAnnotationName(annotationName);
+            annotation.setAnnotationUrl(s3ServiceV2.uploadFile(multipartFile));
+            User user = userRepository.findById((long) userId).get();
+            annotation.setOwner(user);
+            annotation.setReaders(new HashSet<>(Arrays.asList(user)));
+            Paper paper = paperRepository.findById((long) paperId).get();
+            annotation.setPaper(paper);
+          
+        }
         Annotation savedAnnotation = annotationRepository.save(annotation);
         return AnnotationMapper.INSTANCE.toDTO(savedAnnotation);
     }

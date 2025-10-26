@@ -61,4 +61,10 @@ public class PaperController {
         FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
         return ResponseEntity.ok(result);
     }
+
+    @DeleteMapping( "/{id}")
+    public ResponseEntity<Boolean> deletePaper( @PathVariable("id") long paperId ) {
+        boolean result = paperService.deletePaper(paperId);
+        return ResponseEntity.ok(result);
+    }
 }

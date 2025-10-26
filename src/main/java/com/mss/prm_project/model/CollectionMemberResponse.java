@@ -10,4 +10,15 @@ public class CollectionMemberResponse {
     private String email;
     private CollectionMember.MemberRole role;
     private CollectionMember.JoinStatus status;
+
+    public CollectionMemberResponse() {
+    }
+
+    public CollectionMemberResponse(int userId, String username, String email, CollectionMember.MemberRole role, CollectionMember.JoinStatus status) {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.role = role;
+        this.status = status;
+    }
 }

@@ -130,7 +130,6 @@ public class PaperServiceImpl implements PaperService {
     @Override
     public PaperDTO findByPaperId(long paperId) {
         Paper paper = paperRepository.findById(paperId).orElseThrow(null);
-        return PaperMapper.INSTANCE.toDTO(paper);
         PaperDTO dto =  PaperMapper.INSTANCE.toDTO(paper);
         File file = fileRepository.findByPaperPaperId(paper.getPaperId());
         if (file != null) {

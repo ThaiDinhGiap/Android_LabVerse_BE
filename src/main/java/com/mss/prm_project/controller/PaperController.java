@@ -47,10 +47,11 @@ public class PaperController {
         if(Objects.isNull(dto.getPriority())) {
             dto.setPriority(1);
         }
-        LocalDateTime localDateTime = LocalDateTime.parse(publishDate);
-        dto.setPublishDate(localDateTime);
+//        LocalDateTime localDateTime = LocalDateTime.parse(publishDate);
+//        dto.setPublishDate(localDateTime);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime localDateTime = LocalDate.parse(publishDate, formatter).atStartOfDay();        dto.setPublishDate(localDateTime);
+        LocalDateTime localDateTime = LocalDate.parse(publishDate, formatter).atStartOfDay();
+        dto.setPublishDate(localDateTime);
         PaperDTO result = paperService.insertPaper(dto, file);
         return ResponseEntity.ok(result);
     }

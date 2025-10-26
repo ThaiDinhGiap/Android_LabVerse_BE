@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,6 +49,8 @@ public class PaperController {
         }
         LocalDateTime localDateTime = LocalDateTime.parse(publishDate);
         dto.setPublishDate(localDateTime);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime localDateTime = LocalDate.parse(publishDate, formatter).atStartOfDay();        dto.setPublishDate(localDateTime);
         PaperDTO result = paperService.insertPaper(dto, file);
         return ResponseEntity.ok(result);
     }

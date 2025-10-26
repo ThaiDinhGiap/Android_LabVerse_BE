@@ -24,6 +24,9 @@ public class Collection extends BaseEntity {
     @Column(name = "name", columnDefinition = "nvarchar(255)")
     String name;
 
+    @Column(name = "Description", columnDefinition = "nvarchar(550)")
+    String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     User ownerUser;

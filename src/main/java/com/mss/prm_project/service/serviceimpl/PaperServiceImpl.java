@@ -10,6 +10,7 @@ import com.mss.prm_project.mapper.PaperMapper;
 import com.mss.prm_project.mapper.UserMapper;
 import com.mss.prm_project.repository.*;
 import com.mss.prm_project.service.PaperService;
+import com.mss.prm_project.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -71,6 +72,9 @@ public class PaperServiceImpl implements PaperService {
         file.setFileUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
         File savedfile = fileRepository.save(file);
         Paper paper = PaperMapper.INSTANCE.toEntity(dto);
+        String username = SecurityUtils.getCurrentUserName().get();
+        User user = userRepository.findByUsername(username).get();
+        paper.setUser(user);
         Paper savedPaper = paperRepository.save(paper);
         savedfile.setPaper(savedPaper);
         fileRepository.save(savedfile);

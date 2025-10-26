@@ -14,4 +14,6 @@ public interface AnnotationRepository extends JpaRepository<Annotation, Long> {
         WHERE r.userId = :userId
     """)
     List<Annotation> findAllReadableByUserId(@Param("userId") long userId);
+
+    Annotation findByPaperPaperIdAndOwnerUserId(int paperPaperId, int ownerUserId);
 }

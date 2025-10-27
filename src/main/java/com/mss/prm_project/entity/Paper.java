@@ -50,4 +50,7 @@ public class Paper extends  BaseEntity {
 
     @ManyToMany(mappedBy = "papers")
     Set<Collection> collections = new HashSet<>();
+
+    @ManyToMany(mappedBy = "papers")
+    Set<ReadingList> readingLists = new HashSet<>();
 }

@@ -38,7 +38,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/papers/upload").hasAnyRole("RESEARCHER", "PI", "STUDENT")
                         .requestMatchers("/api/annotations/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
                         .requestMatchers("/api/collections/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
-
+                        .requestMatchers("/api/reading-lists/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
 
                         .anyRequest().authenticated()
                 )

@@ -24,9 +24,9 @@ public interface AnnotationService {
     Set<UserDTO> removeReaderFromAnnotation(long annotationId, long userId);
 
     /**
-     * Lấy tất cả annotation mà user có quyền đọc
+     * Lấy tất cả annotation mà user có quyền đọc tương ứng với một Paper cụ thể
      */
-    List<AnnotationDTO> findAllReadableAnnotationByUserId(long userId);
+    List<AnnotationDTO> findAllReadableAnnotationByUserId(int collectionId, long paperId);
 
     /**
      * Lấy thông tin chi tiết của annotation theo id
@@ -44,4 +44,12 @@ public interface AnnotationService {
      * @return true nếu xóa thành công, false nếu không tồn tại
      */
     boolean deleteAnnotation(long annotationId);
+
+    /**
+     * Xóa annotation
+     * @return true nếu xóa thành công, false nếu không tồn tại
+     */
+    AnnotationDTO importAnnotationFromOtherMember(long annotationId, int paperId);
+
+
 }

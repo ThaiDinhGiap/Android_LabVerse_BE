@@ -2,17 +2,15 @@ package com.mss.prm_project.service.serviceimpl;
 
 import com.mss.prm_project.dto.AnnotationDTO;
 import com.mss.prm_project.dto.UserDTO;
-import com.mss.prm_project.entity.Annotation;
-import com.mss.prm_project.entity.File;
-import com.mss.prm_project.entity.Paper;
-import com.mss.prm_project.entity.User;
+import com.mss.prm_project.entity.*;
+import com.mss.prm_project.entity.Collection;
 import com.mss.prm_project.mapper.AnnotationMapper;
 import com.mss.prm_project.mapper.UserMapper;
-import com.mss.prm_project.repository.AnnotationRepository;
-import com.mss.prm_project.repository.PaperRepository;
-import com.mss.prm_project.repository.UserRepository;
+import com.mss.prm_project.repository.*;
 import com.mss.prm_project.service.AnnotationService;
+import com.mss.prm_project.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +27,7 @@ public class AnnotationServiceImpl implements AnnotationService {
     private final UserRepository userRepository;
     private final S3ServiceV2 s3ServiceV2;
     private final PaperRepository paperRepository;
+    private final CollectionRepository collectionRepository;
 
 
     @Override
@@ -60,10 +59,23 @@ public class AnnotationServiceImpl implements AnnotationService {
     }
 
     @Override
-    public List<AnnotationDTO> findAllReadableAnnotationByUserId(long userId) {
-        List<AnnotationDTO> annotationDTOList = new ArrayList<>();
-        annotationDTOList = annotationRepository.findAllReadableByUserId(userId).stream().map(AnnotationMapper.INSTANCE::toDTO).collect(Collectors.toList());
-        return annotationDTOList;
+    public List<AnnotationDTO> findAllReadableAnnotationByUserId(int collectionId, long paperId) {
+        String currentUsername = SecurityUtils.getCurrentUserName().get();
+        long userId = userRepository.findByUsername(currentUsername).get().getUserId();
+        List<Annotation> annotationList = new ArrayList<>();
+        Collection collection = collectionRepository.findById((long) collectionId).get();
+        Set<CollectionMember> collectionMembers = collection.getMembers();
+        List<User> usersInCollection = new ArrayList<>();
+        for (CollectionMember collectionMember : collectionMembers) {
+            usersInCollection.add(collectionMember.getUser());
+        }
+        annotationList = annotationRepository.findAllSharableByUserIdAndPaperId(userId, paperId);
+        for (Annotation annotation : annotationList) {
+            if(!usersInCollection.contains(annotation)){
+                annotationList.remove(annotation);
+            }
+        }
+        return annotationList.stream().map(AnnotationMapper.INSTANCE::toDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -97,5 +109,18 @@ public class AnnotationServiceImpl implements AnnotationService {
         Annotation annotation = annotationRepository.findById(annotationId).get();
         annotationRepository.delete(annotation);
         return false;
+    }
+
+    @Override
+    public AnnotationDTO importAnnotationFromOtherMember(long annotationId, int paperId) {
+        String currentUsername = SecurityUtils.getCurrentUserName().get();
+        int userId = userRepository.findByUsername(currentUsername).get().getUserId();
+        Annotation annotationNew = annotationRepository.findById(annotationId).get();
+        Annotation annotationRoot = annotationRepository.findByPaperPaperIdAndOwnerUserId(userId, paperId);
+        if(Objects.nonNull(annotationRoot) && Objects.nonNull(annotationNew)) {
+            String newUrl = annotationNew.getAnnotationUrl();
+            annotationRoot.setAnnotationUrl(newUrl);
+        }
+        return AnnotationMapper.INSTANCE.toDTO(annotationRoot);
     }
 }

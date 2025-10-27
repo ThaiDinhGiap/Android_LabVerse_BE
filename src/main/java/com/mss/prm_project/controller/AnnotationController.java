@@ -40,10 +40,10 @@ public class AnnotationController {
     }
 
     // API lấy tất cả các Annotation mà user có quyền đọc
-    @GetMapping("/readable/{userId}")
+    @GetMapping("/readable")
     public ResponseEntity<List<AnnotationDTO>> findAllReadableAnnotationByUserId(
-            @PathVariable long userId) {
-        List<AnnotationDTO> annotations = annotationService.findAllReadableAnnotationByUserId(userId);
+            @RequestParam("collectionMemberId") int collectionId, @RequestParam("paperId") long paperId) {
+        List<AnnotationDTO> annotations = annotationService.findAllReadableAnnotationByUserId(collectionId, paperId);
         return ResponseEntity.ok(annotations);
     }
 

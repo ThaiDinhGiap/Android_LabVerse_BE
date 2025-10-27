@@ -7,13 +7,14 @@ import com.mss.prm_project.repository.CollectionRepository;
 import com.mss.prm_project.repository.PaperRepository;
 import com.mss.prm_project.repository.UserRepository;
 import com.mss.prm_project.service.CollectionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 @Service
 public class CollectionServiceImpl implements CollectionService {
 
@@ -111,21 +112,31 @@ public class CollectionServiceImpl implements CollectionService {
 
         return collectionResponse;
     }
-
     @Transactional
     @Override
     public void inviteMember(int collectionID, String invitedEmail, User user) {
 
-        // 1. Kiểm tra Quyền (Người mời phải là PI)
+        // 1. Kiểm tra Quyền (Trả về 403 Forbidden)
         collectionMemberRepository
                 .findByCollectionCollectionIdAndUserUserIdAndRole(collectionID, user.getUserId(), CollectionMember.MemberRole.PI)
-                .orElseThrow(() -> new RuntimeException("Permission denied. Only the PI can invite member of this collection."));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Permission denied. Only the PI can invite member of this collection."
+                ));
 
+        // 2. Kiểm tra Collection (Trả về 404 Not Found)
         Collection collection = collectionRepository.findById((long) collectionID)
-                .orElseThrow(() -> new RuntimeException("Collection not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Collection not found"
+                ));
 
+        // 3. Kiểm tra User (Trả về 404 Not Found)
         User invitedUser = userRepository.findByEmail(invitedEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "User not found"
+                ));
 
         // Tìm bản ghi CollectionMember nếu nó đang ở trạng thái KHÔNG PHẢI REJECTED.
         boolean isAlreadyActiveOrPending = collectionMemberRepository
@@ -135,21 +146,22 @@ public class CollectionServiceImpl implements CollectionService {
                         CollectionMember.JoinStatus.REJECTED
                 );
 
-        // Tạo ID kết hợp
+        // Tạo ID kết hợp (Giữ lại nếu cần cho bước lưu)
         CollectionMemberId checkId = new CollectionMemberId(collectionID, invitedUser.getUserId());
 
+        // 4. Kiểm tra Trùng lặp (Trả về 409 Conflict)
         if (isAlreadyActiveOrPending) {
-            throw new RuntimeException("User is already part of the collection or has a pending invitation.");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "User is already part of the collection or has a pending invitation."
+            );
         }
 
-        // 3. Tạo đối tượng CollectionMemberId cho invitedUser
+        // 5. Tạo và Lưu đối tượng CollectionMember
         CollectionMember collectionMember = new CollectionMember();
-
-        // Sử dụng checkId đã tạo
         collectionMember.setId(checkId);
-
         collectionMember.setCollection(collection);
-        collectionMember.setUser(invitedUser); // Thiết lập mối quan hệ với người được mời
+        collectionMember.setUser(invitedUser);
 
         collectionMember.setRole(CollectionMember.MemberRole.MEMBER);
         collectionMember.setStatus(CollectionMember.JoinStatus.PENDING);
@@ -157,7 +169,7 @@ public class CollectionServiceImpl implements CollectionService {
         collectionMemberRepository.save(collectionMember);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
     public CollectionDetailResponse getCollectionDetails(int collectionId, User user) {
 
@@ -165,7 +177,7 @@ public class CollectionServiceImpl implements CollectionService {
                 .findByCollectionCollectionIdAndUserUserId(collectionId, user.getUserId())
                 .orElseThrow(() -> new RuntimeException("Access denied. User is not a member of this collection."));
 
-        Collection collection = collectionRepository.findById((long) collectionId)
+        Collection collection = collectionRepository.findCollectionDetailsById(collectionId)
                 .orElseThrow(() -> new RuntimeException("Collection not found"));
 
         List<CollectionMemberResponse> memberResponses = collection.getMembers().stream()
@@ -192,7 +204,7 @@ public class CollectionServiceImpl implements CollectionService {
         collectionDetailResponse.setOwnerUsername(collection.getOwnerUser().getUsername());
         collectionDetailResponse.setName(collection.getName());
         collectionDetailResponse.setMemberCount(memberResponses.size());
-        collectionDetailResponse.setPaperCount(memberResponses.size());
+        collectionDetailResponse.setPaperCount(paperResponses.size());
         collectionDetailResponse.setPapers(paperResponses);
         collectionDetailResponse.setMembers(memberResponses);
 

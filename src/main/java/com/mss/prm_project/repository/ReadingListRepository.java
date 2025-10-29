@@ -4,6 +4,7 @@ import com.mss.prm_project.entity.ReadingList;
 import com.mss.prm_project.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,14 @@ public interface ReadingListRepository extends JpaRepository<ReadingList, Long> 
 
     // 3. Kiểm tra quyền sở hữu
     Optional<ReadingList> findByReadingIdAndOwnerUserUserId(int listId, int ownerId);
+
+
+    @Query(value = """
+        SELECT COUNT(*) 
+        FROM reading_list_paper 
+        WHERE reading_id = :listId AND paper_id = :paperId
+        """, nativeQuery = true)
+    int countPaperInList(@Param("listId") int listId, @Param("paperId") int paperId);
+
+
 }

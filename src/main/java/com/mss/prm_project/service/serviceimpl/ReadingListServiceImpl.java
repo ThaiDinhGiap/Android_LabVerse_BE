@@ -11,6 +11,7 @@ import com.mss.prm_project.repository.PaperRepository;
 import com.mss.prm_project.repository.ReadingListRepository;
 import com.mss.prm_project.repository.UserRepository;
 import com.mss.prm_project.service.ReadingListService;
+import jakarta.persistence.EntityManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +27,14 @@ public class ReadingListServiceImpl implements ReadingListService {
     private final ReadingListRepository readingListRepository;
     private final PaperRepository paperRepository;
     private final UserRepository userRepository;
+    private final EntityManager entityManager;
 
-    public ReadingListServiceImpl(ReadingListRepository readingListRepository, PaperRepository paperRepository, UserRepository userRepository) {
+
+    public ReadingListServiceImpl(ReadingListRepository readingListRepository, PaperRepository paperRepository, UserRepository userRepository, EntityManager entityManager) {
         this.readingListRepository = readingListRepository;
         this.paperRepository = paperRepository;
         this.userRepository = userRepository;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -116,18 +120,25 @@ public class ReadingListServiceImpl implements ReadingListService {
     @Override
     @Transactional
     public ReadingListDetailResponse addPaperToList(int listId, int paperId, int userId) {
-        ReadingList list = getListIfOwner(listId, userId);
+
+        ReadingList list = readingListRepository.findByIdWithPapers(listId)
+                .orElseThrow(() -> new RuntimeException("Reading list not found."));
+
+        if (list.getOwnerUser().getUserId() != userId) {
+            throw new SecurityException("You are not allowed to modify this list.");
+        }
+
+        if (readingListRepository.countPaperInList(listId, paperId) > 0) {
+            throw new IllegalArgumentException("Paper already exists in this list.");
+        }
 
         Paper paper = paperRepository.findById((long) paperId)
                 .orElseThrow(() -> new RuntimeException("Paper not found."));
 
-        if (!list.getPapers().add(paper)) {
-            throw new IllegalArgumentException("Paper is already in this reading list.");
-        }
+        list.getPapers().add(paper);
 
-        list = readingListRepository.save(list);
+        readingListRepository.saveAndFlush(list);
 
-        // Ánh xạ trực tiếp từ Entity đã cập nhật sang Detail DTO
         ReadingListDetailResponse response = new ReadingListDetailResponse();
         response.setReadingId(list.getReadingId());
         response.setName(list.getName());
@@ -135,23 +146,19 @@ public class ReadingListServiceImpl implements ReadingListService {
         response.setOwnerUserId(list.getOwnerUser().getUserId());
         response.setOwnerUsername(list.getOwnerUser().getUsername());
 
-        // Ánh xạ Papers
-        List<PaperResponse> paperResponses = list.getPapers().stream()
-                .map(lists ->{
-                    PaperResponse paperDTO = new PaperResponse();
-                    paperDTO.setPaperId(lists.getPaperId());
-                    paperDTO.setTitle(lists.getTitle());
-                    paperDTO.setAuthor(lists.getAuthor());
-                    paperDTO.setJournal(lists.getJournal());
-                    return paperDTO;
-                })
-                .collect(Collectors.toList());
+        response.setPapers(list.getPapers().stream()
+                .map(p -> PaperResponse.builder()
+                        .paperId(p.getPaperId())
+                        .title(p.getTitle())
+                        .author(p.getAuthor())
+                        .journal(p.getJournal())
+                        .build())
+                .collect(Collectors.toList()));
 
-        response.setPapers(paperResponses);
-        response.setPaperCount(paperResponses.size());
-
+        response.setPaperCount(list.getPapers().size());
         return response;
     }
+
 
     @Override
     @Transactional

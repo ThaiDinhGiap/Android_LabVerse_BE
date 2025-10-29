@@ -32,7 +32,7 @@ public class ReadingList extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     User ownerUser;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "reading_list_paper",
             joinColumns = @JoinColumn(name = "reading_id"),
@@ -40,7 +40,10 @@ public class ReadingList extends BaseEntity {
     )
     Set<Paper> papers = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+            CascadeType.MERGE,
+            CascadeType.PERSIST
+    })
     @JoinTable(
             name = "reading_list_viewers", // Bảng nối mới
             joinColumns = @JoinColumn(name = "reading_id"),

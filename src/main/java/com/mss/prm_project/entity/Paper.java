@@ -52,5 +52,6 @@ public class Paper extends  BaseEntity {
     Set<Collection> collections = new HashSet<>();
 
     @ManyToMany(mappedBy = "papers")
-    Set<ReadingList> readingLists = new HashSet<>();
+    private Set<ReadingList> readingLists = new HashSet<>();
+
 }

@@ -84,7 +84,7 @@ public class PaperServiceImpl implements PaperService {
     @Override
     public List<PaperDTO> getPaperByPriority(long collectionid, int priority) {
         Collection collection = collectionRepository.findById(collectionid).get();
-        Set<Paper> paperList = collection.getPapers();
+        List<Paper> paperList = collection.getPapers();
         if(Objects.isNull(priority)){
             return paperList.stream().map(PaperMapper.INSTANCE::toDTO).toList();
         }else{

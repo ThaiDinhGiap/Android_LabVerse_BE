@@ -16,6 +16,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collector;
@@ -54,7 +55,7 @@ public class ReadingListServiceImpl implements ReadingListService {
                 .name(name)
                 .description(description)
                 .ownerUser(owner)
-                .papers(new HashSet<>())
+                .papers(new ArrayList<>())
                 .build();
 
         newList = readingListRepository.save(newList);

@@ -37,15 +37,11 @@ public class PaperServiceImpl implements PaperService {
     private final CollectionRepository collectionRepository;
 
     @Override
-    public List<Paper> getTop10NewestUnreadPapers(int userId) {
+    public List<PaperDTO> getTop10NewestUnreadPapers(int userId) {
         if (!userRepository.existsById((long) userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        var page = paperRepository.findUnreadByUser(
-                userId,
-                PageRequest.of(0, 10, Sort.by("publishDate").descending())
-        );
-        return page.getContent();
+        return paperRepository.findUnreadByUser(userId).stream().map(PaperMapper.INSTANCE::toDTO).toList();
     }
 
     @Override

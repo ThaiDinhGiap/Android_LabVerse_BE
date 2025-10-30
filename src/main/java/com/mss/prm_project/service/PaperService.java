@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface PaperService {
-     List<Paper> getTop10NewestUnreadPapers(int userId);
+     List<PaperDTO> getTop10NewestUnreadPapers(int userId);
 
      List<PaperDTO> getPaperByUserId(int userId);
 

@@ -7,6 +7,6 @@ public class ProfileDTO {
     private String userName;
     private String name;
     private String affiliation;
-    private boolean pushNotifications;
-    private boolean emailNotifications;
+    private boolean instantNotification;
+    private boolean scheduledNotification;
 }

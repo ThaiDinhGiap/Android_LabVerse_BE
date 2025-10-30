@@ -1,6 +1,9 @@
 package com.mss.prm_project.model;
 
 
+import lombok.Builder;
+
+@Builder
 public class PaperResponse {
     int paperId;
 
@@ -19,6 +22,7 @@ public class PaperResponse {
         this.author = author;
         this.journal = journal;
     }
+
 
     public int getPaperId() {
         return paperId;

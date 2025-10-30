@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -32,20 +34,23 @@ public class ReadingList extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     User ownerUser;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "reading_list_paper",
             joinColumns = @JoinColumn(name = "reading_id"),
             inverseJoinColumns = @JoinColumn(name = "paper_id")
     )
-    Set<Paper> papers = new HashSet<>();
+    List<Paper> papers = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+            CascadeType.MERGE,
+            CascadeType.PERSIST
+    })
     @JoinTable(
             name = "reading_list_viewers", // Bảng nối mới
             joinColumns = @JoinColumn(name = "reading_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    Set<User> viewers = new HashSet<>();
+    List<User> viewers = new ArrayList<>();
 
 }

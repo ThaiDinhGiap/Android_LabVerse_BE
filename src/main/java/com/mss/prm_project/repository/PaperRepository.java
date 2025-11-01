@@ -14,4 +14,6 @@ public interface PaperRepository extends JpaRepository<Paper, Long> {
     @Query("select p from Paper p where p not in (select rp.paper from ReadingProgress rp where rp.user.userId = :userId)")
     Page<Paper> findUnreadByUser(@Param("userId") int userId, Pageable pageable);
     List<Paper> findByUserUserId(Integer userId);
+
+    Paper findByPaperId(int paperId);
 }

@@ -91,17 +91,12 @@ public class CollectionServiceImpl implements CollectionService {
         if (!isJoined) {
             throw new RuntimeException("Permission denied. User is not an active member of this collection.");
         }
-        Collection collection = collectionRepository.findById((long) collectionID)
-                .orElseThrow(() -> new RuntimeException("Collection not found"));
+        Collection collection = collectionRepository.findCollectionByCollectionId(collectionID);
+        Paper paper = paperRepository.findByPaperId(paperId);
 
-        Paper paper = paperRepository.findById((long) paperId)
-                .orElseThrow(() -> new RuntimeException("Paper not found"));
+        collection.getPapers().add(paper);
 
-        if (collection.getPapers().add(paper)) {
-            collectionRepository.save(collection);
-        } else  {
-            throw new RuntimeException("Paper is already linked to this collection.");
-        }
+        collectionRepository.save(collection);
 
         CollectionResponse collectionResponse = new CollectionResponse();
         collectionResponse.setCollectionId(collection.getCollectionId());

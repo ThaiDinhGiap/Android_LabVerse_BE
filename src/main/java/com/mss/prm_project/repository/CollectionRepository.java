@@ -26,4 +26,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     """)
     Optional<Collection> findCollectionDetailsById(@Param("collectionId") int collectionId);
 
+    Collection findCollectionByCollectionId(int collectionId);
+
 }

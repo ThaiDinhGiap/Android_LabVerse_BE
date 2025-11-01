@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,10 +53,10 @@ public class User extends BaseEntity implements UserDetails {
 //    Set<Collection> collections = new HashSet<>();
 
     @OneToMany(mappedBy = "ownerUser")
-    private Set<Collection> ownedCollections = new HashSet<>();
+    private List<Collection> ownedCollections = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CollectionMember> memberOfCollections = new HashSet<>();
+    private List<CollectionMember> memberOfCollections = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     List<Paper> paper;
@@ -72,11 +73,14 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "google_link_at")
     private LocalDateTime googleLinkAt;
 
-    @Column(name = "push_notifications", columnDefinition = "boolean default true")
-    private boolean pushNotifications;
+    @Column(name = "instant_push_notification", columnDefinition = "boolean default false")
+    private boolean instantPushNotification;
 
-    @Column(name = "email_notifications", columnDefinition = "boolean default true")
-    private boolean emailNotifications;
+    @Column(name = "scheduled_push_notification", columnDefinition = "boolean default false")
+    private boolean scheduledPushNotification;
+
+    @Column(name = "fcm_token", columnDefinition = "nvarchar(512)")
+    private String fcmToken;
 
     @Override
     public java.util.Collection<? extends GrantedAuthority> getAuthorities() {

@@ -31,11 +31,16 @@ public class SecurityConfiguration {
                 .cors(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/files/**", "/api/user/**").permitAll()
-                        .requestMatchers("/api/papers/**").authenticated()
-                        .requestMatchers("/api/file/**").permitAll()
-                        .requestMatchers("/api/collections/**").permitAll()
+
+                        .requestMatchers("/api/papers/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
+                        .requestMatchers("/api/file/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
+                        .requestMatchers("/api/papers/upload").hasAnyRole("RESEARCHER", "PI", "STUDENT")
+                        .requestMatchers("/api/annotations/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
+                        .requestMatchers("/api/collections/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
+
+                        .requestMatchers("/api/reading-lists/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
+
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)

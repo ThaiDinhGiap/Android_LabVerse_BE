@@ -6,7 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -50,4 +52,8 @@ public class Paper extends  BaseEntity {
 
     @ManyToMany(mappedBy = "papers")
     Set<Collection> collections = new HashSet<>();
+
+    @ManyToMany(mappedBy = "papers")
+    private List<ReadingList> readingLists = new ArrayList<>();
+
 }

@@ -2,11 +2,8 @@ package com.mss.prm_project.controller;
 
 import com.mss.prm_project.dto.FavoritePaperDTO;
 import com.mss.prm_project.dto.PaperDTO;
-import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.service.PaperService;
 import lombok.RequiredArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +22,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @RequestMapping("/api/papers")
 public class PaperController {
+
     private final PaperService paperService;
+
 
     @GetMapping("/{id}")
     public ResponseEntity<PaperDTO> getPaperDetail(@PathVariable("id") int id) {
@@ -48,10 +43,11 @@ public class PaperController {
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String fromDate,
             @RequestParam(required = false) String toDate,
-            @RequestParam(required = false) Integer userId){ {
-        List<PaperDTO> results = paperService.getPaperByUserId(q, author, journal, priority, publisher, date, fromDate, toDate, userId);
-        return ResponseEntity.ok(results);
-    }
+            @RequestParam(required = false) Integer userId) {
+        {
+            List<PaperDTO> results = paperService.getPaperByUserId(q, author, journal, priority, publisher, date, fromDate, toDate, userId);
+            return ResponseEntity.ok(results);
+        }
     }
 
 

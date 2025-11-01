@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -15,6 +15,6 @@ public class AnnotationDTO extends BaseDTO{
     String annotationName;
     String annotationUrl;
     UserDTO ownerDTO;
-    Set<UserDTO> readerDTO;
+    List<UserDTO> readerDTO;
     PaperDTO paperDTO;
 }

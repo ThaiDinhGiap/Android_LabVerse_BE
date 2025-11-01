@@ -73,11 +73,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "google_link_at")
     private LocalDateTime googleLinkAt;
 
-    @Column(name = "push_notifications", columnDefinition = "boolean default true")
-    private boolean pushNotifications;
+    @Column(name = "instant_push_notification", columnDefinition = "boolean default false")
+    private boolean instantPushNotification;
 
-    @Column(name = "email_notifications", columnDefinition = "boolean default true")
-    private boolean emailNotifications;
+    @Column(name = "scheduled_push_notification", columnDefinition = "boolean default false")
+    private boolean scheduledPushNotification;
 
     @Column(name = "fcm_token", columnDefinition = "nvarchar(512)")
     private String fcmToken;

@@ -38,8 +38,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).get();
         return userRepository.findByEmail(email)
+
                 .map(UserMapper.INSTANCE::userToUserDTO);
+
     }
 
     @Override
@@ -75,8 +78,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username).get();
         ProfileDTO profileDTO = new ProfileDTO();
         profileDTO.setName(user.getFullName());
-        profileDTO.setEmailNotifications(user.isEmailNotifications());
-        profileDTO.setPushNotifications(user.isPushNotifications());
+        profileDTO.setInstantNotification(user.isInstantPushNotification());
+        profileDTO.setScheduledNotification(user.isScheduledPushNotification());
         return profileDTO;
     }
 
@@ -96,8 +99,8 @@ public class UserServiceImpl implements UserService {
     public boolean updateNotificationPreferences(SettingDTO settingDTO) {
         try {
             User user = userRepository.findByUsername(settingDTO.getUserName()).get();
-            user.setEmailNotifications(settingDTO.isEmailNotifications());
-            user.setPushNotifications(settingDTO.isPushNotifications());
+            user.setInstantPushNotification(settingDTO.isInstantNotification());
+            user.setScheduledPushNotification(settingDTO.isScheduledNotification());
             userRepository.save(user);
             return true;
         } catch (Exception e) {

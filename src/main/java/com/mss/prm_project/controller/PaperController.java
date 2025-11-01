@@ -68,8 +68,8 @@ public class PaperController {
 //    }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-        public ResponseEntity<PaperDTO> uploadPaper(@RequestPart("dto") PaperDTO dto, @RequestParam("publishDate") String publishDate, @RequestParam("file") MultipartFile file) throws IOException {
-        if(Objects.isNull(dto.getPriority())) {
+    public ResponseEntity<PaperDTO> uploadPaper(@RequestPart("dto") PaperDTO dto, @RequestParam("publishDate") String publishDate, @RequestParam("file") MultipartFile file) throws IOException {
+        if (Objects.isNull(dto.getPriority())) {
             dto.setPriority(1);
         }
 //        LocalDateTime localDateTime = LocalDateTime.parse(publishDate);
@@ -91,14 +91,14 @@ public class PaperController {
         return ResponseEntity.ok(results);
     }
 
-    @DeleteMapping( "/{id}")
-    public ResponseEntity<Boolean> deletePaper( @PathVariable("id") long paperId ) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deletePaper(@PathVariable("id") long paperId) {
         boolean result = paperService.deletePaper(paperId);
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping( "/add-to-favourite")
-    public ResponseEntity<FavoritePaperDTO> addToFavoritePapers(@RequestParam("userId") long userId , @RequestParam("paperId") long paperId ) {
+    @PostMapping("/add-to-favourite")
+    public ResponseEntity<FavoritePaperDTO> addToFavoritePapers(@RequestParam("userId") long userId, @RequestParam("paperId") long paperId) {
         FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
         return ResponseEntity.ok(result);
     }

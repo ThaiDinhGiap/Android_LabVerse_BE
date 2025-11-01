@@ -51,7 +51,7 @@ public class Paper extends  BaseEntity {
     int priority;
 
     @ManyToMany(mappedBy = "papers")
-    Set<Collection> collections = new HashSet<>();
+    List<Collection> collections = new ArrayList<>();
 
     @ManyToMany(mappedBy = "papers")
     private List<ReadingList> readingLists = new ArrayList<>();

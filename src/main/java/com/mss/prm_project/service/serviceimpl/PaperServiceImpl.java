@@ -64,8 +64,8 @@ public class PaperServiceImpl implements PaperService {
     @Override
     public PaperDTO insertPaper(PaperDTO dto, MultipartFile multipartFile) throws IOException {
         File file = new File();
-//        file.setFileUrl(s3ServiceV2.uploadFile(multipartFile));
-        file.setFileUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
+        file.setFileUrl(s3ServiceV2.uploadFile(multipartFile));
+//        file.setFileUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
         File savedfile = fileRepository.save(file);
         Paper paper = PaperMapper.INSTANCE.toEntity(dto);
         String username = SecurityUtils.getCurrentUserName().get();

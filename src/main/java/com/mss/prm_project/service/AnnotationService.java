@@ -15,18 +15,18 @@ public interface AnnotationService {
      * Chia sẻ annotation cho 1 user cụ thể
      * @return AnnotationDTO sau khi đã thêm reader
      */
-    Set<UserDTO> shareReaderToAnnotation(long annotationId, long userId);
+    List<UserDTO> shareAnnotationToOther(long paperId, List<Long> userIdList);
 
     /**
      * Gỡ quyền đọc annotation khỏi user
      * @return AnnotationDTO sau khi đã cập nhật danh sách readers
      */
-    Set<UserDTO> removeReaderFromAnnotation(long annotationId, long userId);
+    List<UserDTO> removeReaderFromAnnotation(long annotationId, long userId);
 
     /**
-     * Lấy tất cả annotation mà user có quyền đọc
+     * Lấy tất cả annotation mà user có quyền đọc tương ứng với một Paper cụ thể
      */
-    List<AnnotationDTO> findAllReadableAnnotationByUserId(long userId);
+    List<AnnotationDTO> findAllReadableAnnotationByUserId(int collectionId, long paperId);
 
     /**
      * Lấy thông tin chi tiết của annotation theo id
@@ -44,4 +44,12 @@ public interface AnnotationService {
      * @return true nếu xóa thành công, false nếu không tồn tại
      */
     boolean deleteAnnotation(long annotationId);
+
+    /**
+     * Xóa annotation
+     * @return true nếu xóa thành công, false nếu không tồn tại
+     */
+    AnnotationDTO importAnnotationFromOtherMember(long annotationId, int paperId);
+
+
 }

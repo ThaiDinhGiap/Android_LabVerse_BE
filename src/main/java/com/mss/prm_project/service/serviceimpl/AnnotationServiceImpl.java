@@ -31,31 +31,37 @@ public class AnnotationServiceImpl implements AnnotationService {
 
 
     @Override
-    public Set<UserDTO> shareReaderToAnnotation(long annotationId, long userId) {
-        Annotation annotation = annotationRepository.findById(annotationId).get();
-        User user = userRepository.findById(userId).get();
-        Set<UserDTO> userDTOSet = new HashSet<>();
+    public List<UserDTO> shareAnnotationToOther(long paperId, List<Long> userIdList) {
+        String currentUsername = SecurityUtils.getCurrentUserName().get();
+        User user = userRepository.findByUsername(currentUsername).get();
+        Annotation annotation = annotationRepository.findByPaperPaperIdAndOwnerUserId((int)paperId, user.getUserId());
+        List<User> newReaderList = new ArrayList<>();
+        List<UserDTO> readerDTOList = new ArrayList<>();
         if(Objects.nonNull(user)) {
-            Set<User> readerDTOs = annotation.getReaders();
-            readerDTOs.add(user);
+            List<User> reader = annotation.getReaders();
+            for(User u : newReaderList) {
+                if(!reader.contains(u)) {
+                    reader.add(u);
+                }
+            }
             annotationRepository.save(annotation);
-            userDTOSet = readerDTOs.stream().map(UserMapper.INSTANCE::userToUserDTO).collect(Collectors.toSet());
+            readerDTOList = reader.stream().map(UserMapper.INSTANCE::userToUserDTO).collect(Collectors.toList());
         }
-        return userDTOSet;
+        return readerDTOList;
     }
 
     @Override
-    public Set<UserDTO> removeReaderFromAnnotation(long annotationId, long userId) {
+    public List<UserDTO> removeReaderFromAnnotation(long annotationId, long userId) {
         Annotation annotation = annotationRepository.findById(annotationId).get();
-        Set<UserDTO> userDTOSet = new HashSet<>();
+        List<UserDTO> userDTOList = new ArrayList<>();
         User user = userRepository.findById(userId).get();
         if (annotation.getReaders().contains(user)) {
-            Set<User> readerDTOs = annotation.getReaders();
+            List<User> readerDTOs = annotation.getReaders();
             boolean addResult = readerDTOs.remove(user);
             annotationRepository.save(annotation);
-            userDTOSet = readerDTOs.stream().map(UserMapper.INSTANCE::userToUserDTO).collect(Collectors.toSet());
+            userDTOList = readerDTOs.stream().map(UserMapper.INSTANCE::userToUserDTO).collect(Collectors.toList());
         }
-        return userDTOSet;
+        return userDTOList;
     }
 
     @Override
@@ -64,7 +70,7 @@ public class AnnotationServiceImpl implements AnnotationService {
         long userId = userRepository.findByUsername(currentUsername).get().getUserId();
         List<Annotation> annotationList = new ArrayList<>();
         Collection collection = collectionRepository.findById((long) collectionId).get();
-        Set<CollectionMember> collectionMembers = collection.getMembers();
+        List<CollectionMember> collectionMembers = collection.getMembers();
         List<User> usersInCollection = new ArrayList<>();
         for (CollectionMember collectionMember : collectionMembers) {
             usersInCollection.add(collectionMember.getUser());
@@ -95,7 +101,7 @@ public class AnnotationServiceImpl implements AnnotationService {
             annotation.setAnnotationUrl(s3ServiceV2.uploadFile(multipartFile));
             User user = userRepository.findById((long) userId).get();
             annotation.setOwner(user);
-            annotation.setReaders(new HashSet<>(Arrays.asList(user)));
+            annotation.setReaders(new ArrayList<>(Arrays.asList(user)));
             Paper paper = paperRepository.findById((long) paperId).get();
             annotation.setPaper(paper);
           

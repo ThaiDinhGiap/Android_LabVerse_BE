@@ -23,19 +23,19 @@ public class AnnotationController {
 
     // API chia sẻ quyền đọc cho user
     @PostMapping()
-    public ResponseEntity<Set<UserDTO>> shareReaderToAnnotation(
-            @RequestParam("annotationId") long annotationId,
-            @RequestParam("userId") long userId) {
-        Set<UserDTO> updatedReaders = annotationService.shareReaderToAnnotation(annotationId, userId);
+    public ResponseEntity<List<UserDTO>> shareAnnotationToOther(
+            @RequestParam("paperId") long paperId,
+            @RequestParam("userIdList") List<Long> userIdList) {
+        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(paperId, userIdList);
         return ResponseEntity.ok(updatedReaders);
     }
 
     // API xóa quyền đọc của user
     @DeleteMapping("/{annotationId}/remove/{userId}")
-    public ResponseEntity<Set<UserDTO>> removeReaderFromAnnotation(
+    public ResponseEntity<List<UserDTO>> removeReaderFromAnnotation(
             @PathVariable long annotationId,
             @PathVariable long userId) {
-        Set<UserDTO> updatedReaders = annotationService.removeReaderFromAnnotation(annotationId, userId);
+        List<UserDTO> updatedReaders = annotationService.removeReaderFromAnnotation(annotationId, userId);
         return ResponseEntity.ok(updatedReaders);
     }
 

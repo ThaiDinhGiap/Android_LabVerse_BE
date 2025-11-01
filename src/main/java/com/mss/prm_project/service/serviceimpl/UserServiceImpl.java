@@ -38,8 +38,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).get();
         return userRepository.findByEmail(email)
+
                 .map(UserMapper.INSTANCE::userToUserDTO);
+
     }
 
     @Override

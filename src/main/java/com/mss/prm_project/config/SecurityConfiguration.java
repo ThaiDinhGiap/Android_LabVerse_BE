@@ -40,7 +40,6 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/collections/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
 
                         .requestMatchers("/api/reading-lists/**").hasAnyRole("RESEARCHER", "PI", "STUDENT")
-
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)

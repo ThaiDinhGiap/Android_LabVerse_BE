@@ -5,6 +5,8 @@ import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.service.PaperService;
 import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,6 +54,7 @@ public class PaperController {
     }
     }
 
+
     @GetMapping("/newest-unread")
     public ResponseEntity<List<PaperDTO>> getNewestUnread(@RequestParam int userId) {
         List<PaperDTO> papers = paperService.getTop10NewestUnreadPapers(userId);
@@ -75,12 +81,6 @@ public class PaperController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping( "/add-to-favourite")
-    public ResponseEntity<FavoritePaperDTO> addToFavoritePapers(@RequestParam("userId") long userId , @RequestParam("paperId") long paperId ) {
-        FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping("/sync")
     public ResponseEntity<List<PaperDTO>> getUpdatedPapers(@RequestParam("lastSync") Long lastSyncMillis) {
         LocalDateTime lastSync = null;
@@ -94,6 +94,12 @@ public class PaperController {
     @DeleteMapping( "/{id}")
     public ResponseEntity<Boolean> deletePaper( @PathVariable("id") long paperId ) {
         boolean result = paperService.deletePaper(paperId);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping( "/add-to-favourite")
+    public ResponseEntity<FavoritePaperDTO> addToFavoritePapers(@RequestParam("userId") long userId , @RequestParam("paperId") long paperId ) {
+        FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
         return ResponseEntity.ok(result);
     }
 }

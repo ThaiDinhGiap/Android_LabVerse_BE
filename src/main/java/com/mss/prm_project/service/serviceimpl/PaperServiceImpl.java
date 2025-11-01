@@ -166,6 +166,13 @@ public class PaperServiceImpl implements PaperService {
 
 
     @Override
+    public List<PaperDTO> getUpdatedPapers(LocalDateTime lastSync) {
+        return paperRepository.findAllUpdatedAfter(lastSync).stream()
+                .map(PaperMapper.INSTANCE::toDTO)
+                .toList();
+    }
+
+    @Override
     public FavoritePaperDTO addtoFavoritePapers(long userId, long paperId) {
         User user = userRepository.findById(userId).orElseThrow(null);
         Paper paper = paperRepository.findById(paperId).orElseThrow(null);
@@ -177,13 +184,6 @@ public class PaperServiceImpl implements PaperService {
         favoritePaper.setPaper(paper);
         FavoritePaper savedfavoritePaper = favoritePaperRepository.save(favoritePaper);
         return FavouriteMapper.INSTANCE.toDTO(savedfavoritePaper);
-    }
-
-    @Override
-    public List<PaperDTO> getUpdatedPapers(LocalDateTime lastSync) {
-        return paperRepository.findAllUpdatedAfter(lastSync).stream()
-                .map(PaperMapper.INSTANCE::toDTO)
-                .toList();
     }
 
     @Override

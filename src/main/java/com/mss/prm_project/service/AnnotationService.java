@@ -13,7 +13,7 @@ public interface AnnotationService {
      * Chia sẻ annotation cho 1 user cụ thể
      * @return AnnotationDTO sau khi đã thêm reader
      */
-    List<UserDTO> shareAnnotationToOther(long paperId, List<Long> userIdList);
+    List<UserDTO> shareAnnotationToOther(long annotationId, List<Long> userIdList);
 
     /**
      * Gỡ quyền đọc annotation khỏi user

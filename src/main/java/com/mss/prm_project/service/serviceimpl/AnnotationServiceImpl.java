@@ -31,10 +31,8 @@ public class AnnotationServiceImpl implements AnnotationService {
 
 
     @Override
-    public List<UserDTO> shareAnnotationToOther(long paperId, List<Long> userIdList) {
-        String currentUsername = SecurityUtils.getCurrentUserName().get();
-        User user = userRepository.findByUsername(currentUsername).orElseThrow(()-> new IllegalArgumentException("User not found"));
-        Annotation annotation = annotationRepository.findByPaperPaperIdAndOwnerUserId((int)paperId, user.getUserId());
+    public List<UserDTO> shareAnnotationToOther(long annotationId, List<Long> userIdList) {
+        Annotation annotation = annotationRepository.findById(annotationId).orElseThrow(()-> new IllegalArgumentException("Annotation not found"));
         List<User> newReaderList = annotation.getReaders();
         List<UserDTO> readerDTOList = new ArrayList<>();
         for(Long userId : userIdList) {

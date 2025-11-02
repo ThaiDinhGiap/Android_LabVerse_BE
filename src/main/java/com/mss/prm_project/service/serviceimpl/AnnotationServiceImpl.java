@@ -31,22 +31,19 @@ public class AnnotationServiceImpl implements AnnotationService {
 
 
     @Override
-    public List<UserDTO> shareAnnotationToOther(long paperId, List<Long> userIdList) {
-        String currentUsername = SecurityUtils.getCurrentUserName().get();
-        User user = userRepository.findByUsername(currentUsername).get();
-        Annotation annotation = annotationRepository.findByPaperPaperIdAndOwnerUserId((int)paperId, user.getUserId());
-        List<User> newReaderList = new ArrayList<>();
+    public List<UserDTO> shareAnnotationToOther(long annotationId, List<Long> userIdList) {
+        Annotation annotation = annotationRepository.findById(annotationId).orElseThrow(()-> new IllegalArgumentException("Annotation not found"));
+        List<User> newReaderList = annotation.getReaders();
         List<UserDTO> readerDTOList = new ArrayList<>();
-        if(Objects.nonNull(user)) {
-            List<User> reader = annotation.getReaders();
-            for(User u : newReaderList) {
-                if(!reader.contains(u)) {
-                    reader.add(u);
-                }
+        for(Long userId : userIdList) {
+            User newUser = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("User not found"));
+            if(!newReaderList.contains(newUser)) {
+                newReaderList.add(newUser);
             }
-            annotationRepository.save(annotation);
-            readerDTOList = reader.stream().map(UserMapper.INSTANCE::userToUserDTO).collect(Collectors.toList());
         }
+        annotation.setReaders(newReaderList);
+        annotationRepository.save(annotation);
+        readerDTOList = newReaderList.stream().map(UserMapper.INSTANCE::userToUserDTO).collect(Collectors.toList());
         return readerDTOList;
     }
 
@@ -118,15 +115,25 @@ public class AnnotationServiceImpl implements AnnotationService {
     }
 
     @Override
-    public AnnotationDTO importAnnotationFromOtherMember(long annotationId, int paperId) {
+    public AnnotationDTO importAnnotationFromOtherMember(long annotationId) {
         String currentUsername = SecurityUtils.getCurrentUserName().get();
-        int userId = userRepository.findByUsername(currentUsername).get().getUserId();
-        Annotation annotationNew = annotationRepository.findById(annotationId).get();
-        Annotation annotationRoot = annotationRepository.findByPaperPaperIdAndOwnerUserId(userId, paperId);
-        if(Objects.nonNull(annotationRoot) && Objects.nonNull(annotationNew)) {
+        User user = userRepository.findByUsername(currentUsername).get();
+        Annotation annotationNew = annotationRepository.findById(annotationId)
+                .orElseThrow(() -> new IllegalArgumentException("Annotation with ID " + annotationId + " not found"));
+        Paper paper = annotationNew.getPaper();
+        Annotation annotationRoot = annotationRepository.findByPaperPaperIdAndOwnerUserId(user.getUserId(), paper.getPaperId());
+        if(Objects.nonNull(annotationRoot)) {
             String newUrl = annotationNew.getAnnotationUrl();
             annotationRoot.setAnnotationUrl(newUrl);
+        }else {
+            annotationRoot = new Annotation();
+            annotationRoot.setAnnotationName(annotationNew.getAnnotationName());
+            annotationRoot.setAnnotationUrl(annotationNew.getAnnotationUrl());
+            annotationRoot.setOwner(user);
+            annotationRoot.setPaper(paper);
+            annotationRoot.setReaders(new ArrayList<>(Arrays.asList(user)));
         }
+        annotationRepository.save(annotationRoot);
         return AnnotationMapper.INSTANCE.toDTO(annotationRoot);
     }
 }

@@ -49,4 +49,6 @@ public interface PaperRepository extends JpaRepository<Paper, Long> {
     List<Paper> findAllUpdatedAfter(@Param("lastSync") LocalDateTime lastSync);
 
 
+
+    Paper findByPaperId(int paperId);
 }

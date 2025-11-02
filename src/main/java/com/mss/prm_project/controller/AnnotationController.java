@@ -24,9 +24,9 @@ public class AnnotationController {
     // API chia sẻ quyền đọc cho user
     @PostMapping()
     public ResponseEntity<List<UserDTO>> shareAnnotationToOther(
-            @RequestParam("paperId") long paperId,
+            @RequestParam("annotationId") long annotationId,
             @RequestParam("userIdList") List<Long> userIdList) {
-        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(paperId, userIdList);
+        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(annotationId, userIdList);
         return ResponseEntity.ok(updatedReaders);
     }
 
@@ -71,5 +71,11 @@ public class AnnotationController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<AnnotationDTO> importAnnotationFromOtherMember(@RequestParam("annotationId") long annotationId) {
+        AnnotationDTO importedAnnotation = annotationService.importAnnotationFromOtherMember(annotationId);
+        return ResponseEntity.status(201).body(importedAnnotation);
     }
 }

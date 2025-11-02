@@ -1,13 +1,11 @@
 package com.mss.prm_project.service;
 
 import com.mss.prm_project.dto.AnnotationDTO;
-import com.mss.prm_project.dto.FileDTO;
 import com.mss.prm_project.dto.UserDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 public interface AnnotationService {
 
@@ -49,7 +47,7 @@ public interface AnnotationService {
      * Xóa annotation
      * @return true nếu xóa thành công, false nếu không tồn tại
      */
-    AnnotationDTO importAnnotationFromOtherMember(long annotationId, int paperId);
+    AnnotationDTO importAnnotationFromOtherMember(long annotationId);
 
 
 }

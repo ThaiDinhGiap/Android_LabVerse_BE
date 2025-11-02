@@ -72,4 +72,10 @@ public class AnnotationController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping("/import")
+    public ResponseEntity<AnnotationDTO> importAnnotationFromOtherMember(@RequestParam("annotationId") long annotationId) {
+        AnnotationDTO importedAnnotation = annotationService.importAnnotationFromOtherMember(annotationId);
+        return ResponseEntity.status(201).body(importedAnnotation);
+    }
 }

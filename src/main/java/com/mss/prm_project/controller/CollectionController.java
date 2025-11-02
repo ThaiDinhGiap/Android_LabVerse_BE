@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -32,7 +33,6 @@ public class CollectionController {
 
     @GetMapping
     public ResponseEntity<List<CollectionResponse>> getMyCollections(@AuthenticationPrincipal User user){
-
         List<CollectionResponse> collectionResponse = collectionService.getMyCollections(user);
         return ResponseEntity.status(HttpStatus.OK).body(collectionResponse);
     }
@@ -51,6 +51,12 @@ public class CollectionController {
             @RequestBody AddPaperRequest request,
             @AuthenticationPrincipal User user){
 
+        System.out.println(collectionId + String.valueOf(request));
+        System.out.println(request.getPaperId());
+
+        if (request == null || request.getPaperId() == 0 || request.getPaperId() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "paperId is required and must be > 0");
+        }
         CollectionResponse response = collectionService.addPaperCollection(
                 collectionId,
                 request.getPaperId(),

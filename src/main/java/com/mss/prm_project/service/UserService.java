@@ -19,6 +19,6 @@ public interface UserService {
     ProfileDTO getUserProfileByUsername(String username) throws Exception;
     boolean updateUserPassword(PasswordChangeDTO passwordChangeDTO);
     boolean updateNotificationPreferences(SettingDTO settingDTO);
-    ProfileDTO updateProfile(ProfileDTO profileDTO);
+    ProfileDTO updateProfile(ProfileDTO profileDTO) throws Exception;
     void updateFcmToken(String username, String fcmToken) throws FirebaseMessagingException;
 }

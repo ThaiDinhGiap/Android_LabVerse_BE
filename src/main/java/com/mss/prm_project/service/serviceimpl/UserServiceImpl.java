@@ -78,8 +78,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username).get();
         ProfileDTO profileDTO = new ProfileDTO();
         profileDTO.setName(user.getFullName());
+        profileDTO.setEmail(user.getEmail());
         profileDTO.setInstantNotification(user.isInstantPushNotification());
         profileDTO.setScheduledNotification(user.isScheduledPushNotification());
+        if (user.getGoogleSub() != null) {
+            profileDTO.setGoogleLinked(true);
+        } else {
+            profileDTO.setGoogleLinked(false);
+        }
         return profileDTO;
     }
 
@@ -109,8 +115,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ProfileDTO updateProfile(ProfileDTO profileDTO) {
+    public ProfileDTO updateProfile(ProfileDTO profileDTO) throws Exception {
         User user = userRepository.findByUsername(profileDTO.getUserName()).get();
+        String newEmail = profileDTO.getEmail();
+        String oldEmail = user.getEmail();
+
+        if (!oldEmail.equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+            throw new Exception("Email already in use!");
+        }
+
+        if (!oldEmail.equals(newEmail)) {
+            user.setEmail(newEmail);
+            user.setGoogleSub(null);
+        }
+
         user.setFullName(profileDTO.getName());
         userRepository.save(user);
         return profileDTO;

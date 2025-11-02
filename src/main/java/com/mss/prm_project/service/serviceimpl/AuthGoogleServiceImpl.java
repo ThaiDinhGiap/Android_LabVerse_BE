@@ -45,9 +45,9 @@ public class AuthGoogleServiceImpl implements AuthGoogleService {
         }
 
 
-        if (userDtoOpt.getEmailVerifyAt() == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED");
-        }
+//        if (userDtoOpt.getEmailVerifyAt() == null) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED");
+//        }
 
         String accessToken  = jwtService.generateAcessToken(userDtoOpt);
         String refreshToken = jwtService.generateRefreshToken(userDtoOpt);
@@ -79,14 +79,13 @@ public class AuthGoogleServiceImpl implements AuthGoogleService {
         User me = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
 
-        if (me.getEmailVerifyAt() == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED");
-        }
-
-        // email Google phải trùng email tài khoản
-//        if (!me.getEmail().equalsIgnoreCase(gp.email())) {
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "EMAIL_MISMATCH");
+//        if (me.getEmailVerifyAt() == null) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED");
 //        }
+
+        if (!me.getEmail().equalsIgnoreCase(gp.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "EMAIL_MISMATCH");
+        }
 
         userRepository.findByGoogleSub(gp.sub()).ifPresent(existing -> {
             if (existing.getUserId() != me.getUserId()) {

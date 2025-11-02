@@ -27,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    public ResponseEntity<ProfileDTO> updateProfile(@RequestBody ProfileDTO profileDTO) {
+    public ResponseEntity<ProfileDTO> updateProfile(@RequestBody ProfileDTO profileDTO) throws Exception{
         return ResponseEntity.ok(userService.updateProfile(profileDTO));
     }
 

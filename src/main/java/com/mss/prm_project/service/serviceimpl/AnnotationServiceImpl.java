@@ -128,7 +128,8 @@ public class AnnotationServiceImpl implements AnnotationService {
             annotationRoot.setAnnotationUrl(newUrl);
         }else {
             annotationRoot = new Annotation();
-            annotationRoot.setAnnotationName(annotationNew.getAnnotationName());
+            String cleanTitle = paper.getTitle().replaceAll("(?i)\\.pdf$", "");
+            annotationRoot.setAnnotationName(cleanTitle + "_annotations_" + user.getUsername());
             annotationRoot.setAnnotationUrl(annotationNew.getAnnotationUrl());
             annotationRoot.setOwner(user);
             annotationRoot.setPaper(paper);

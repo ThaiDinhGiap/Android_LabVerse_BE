@@ -24,9 +24,9 @@ public class AnnotationController {
     // API chia sẻ quyền đọc cho user
     @PostMapping()
     public ResponseEntity<List<UserDTO>> shareAnnotationToOther(
-            @RequestParam("annotationId") long annotationId,
+            @RequestParam("paperId") int paperId,
             @RequestParam("userIdList") List<Long> userIdList) {
-        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(annotationId, userIdList);
+        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(paperId, userIdList);
         return ResponseEntity.ok(updatedReaders);
     }
 

@@ -75,7 +75,7 @@ public class AnnotationServiceImpl implements AnnotationService {
         }
         annotationList = annotationRepository.findAllSharableByUserIdAndPaperId(userId, paperId);
         for (Annotation annotation : annotationList) {
-            if(!usersInCollection.contains(annotation)){
+            if(!usersInCollection.contains(annotation.getOwner())){
                 annotationList.remove(annotation);
             }
         }

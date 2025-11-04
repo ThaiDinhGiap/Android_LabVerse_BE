@@ -24,9 +24,9 @@ public class AnnotationController {
     // API chia sẻ quyền đọc cho user
     @PostMapping()
     public ResponseEntity<List<UserDTO>> shareAnnotationToOther(
-            @RequestParam("annotationId") long annotationId,
+            @RequestParam("paperId") int paperId,
             @RequestParam("userIdList") List<Long> userIdList) {
-        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(annotationId, userIdList);
+        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(paperId, userIdList);
         return ResponseEntity.ok(updatedReaders);
     }
 
@@ -42,7 +42,7 @@ public class AnnotationController {
     // API lấy tất cả các Annotation mà user có quyền đọc
     @GetMapping("/readable")
     public ResponseEntity<List<AnnotationDTO>> findAllReadableAnnotationByUserId(
-            @RequestParam("collectionMemberId") int collectionId, @RequestParam("paperId") long paperId) {
+            @RequestParam("collectionId") int collectionId, @RequestParam("paperId") long paperId) {
         List<AnnotationDTO> annotations = annotationService.findAllReadableAnnotationByUserId(collectionId, paperId);
         return ResponseEntity.ok(annotations);
     }

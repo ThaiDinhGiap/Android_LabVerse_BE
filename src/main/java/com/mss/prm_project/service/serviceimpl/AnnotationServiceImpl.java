@@ -31,8 +31,9 @@ public class AnnotationServiceImpl implements AnnotationService {
 
 
     @Override
-    public List<UserDTO> shareAnnotationToOther(long annotationId, List<Long> userIdList) {
-        Annotation annotation = annotationRepository.findById(annotationId).orElseThrow(()-> new IllegalArgumentException("Annotation not found"));
+    public List<UserDTO> shareAnnotationToOther(int paperId, List<Long> userIdList) {
+        User user = userRepository.findByUsername(SecurityUtils.getCurrentUserName().get()).orElseThrow(()-> new IllegalArgumentException("User not found"));
+        Annotation annotation = annotationRepository.findByPaperPaperIdAndOwnerUserId(paperId, user.getUserId());
         List<User> newReaderList = annotation.getReaders();
         List<UserDTO> readerDTOList = new ArrayList<>();
         for(Long userId : userIdList) {
@@ -74,7 +75,7 @@ public class AnnotationServiceImpl implements AnnotationService {
         }
         annotationList = annotationRepository.findAllSharableByUserIdAndPaperId(userId, paperId);
         for (Annotation annotation : annotationList) {
-            if(!usersInCollection.contains(annotation)){
+            if(!usersInCollection.contains(annotation.getOwner())){
                 annotationList.remove(annotation);
             }
         }
@@ -127,7 +128,8 @@ public class AnnotationServiceImpl implements AnnotationService {
             annotationRoot.setAnnotationUrl(newUrl);
         }else {
             annotationRoot = new Annotation();
-            annotationRoot.setAnnotationName(annotationNew.getAnnotationName());
+            String cleanTitle = paper.getTitle().replaceAll("(?i)\\.pdf$", "");
+            annotationRoot.setAnnotationName(cleanTitle + "_annotations_" + user.getUsername());
             annotationRoot.setAnnotationUrl(annotationNew.getAnnotationUrl());
             annotationRoot.setOwner(user);
             annotationRoot.setPaper(paper);

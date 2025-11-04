@@ -39,7 +39,7 @@ public class Annotation extends BaseEntity{
     @JoinColumn(name = "owner_id", nullable = false)
     User owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "paper_id", nullable = false)
     Paper paper;
 

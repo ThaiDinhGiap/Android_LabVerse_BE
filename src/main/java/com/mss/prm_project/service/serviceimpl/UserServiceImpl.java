@@ -79,8 +79,8 @@ public class UserServiceImpl implements UserService {
         ProfileDTO profileDTO = new ProfileDTO();
         profileDTO.setName(user.getFullName());
         profileDTO.setEmail(user.getEmail());
-        profileDTO.setInstantNotification(user.isInstantPushNotification());
-        profileDTO.setScheduledNotification(user.isScheduledPushNotification());
+        profileDTO.setInstantPushNotification(user.isInstantPushNotification());
+        profileDTO.setScheduledPushNotification(user.isScheduledPushNotification());
         if (user.getGoogleSub() != null) {
             profileDTO.setGoogleLinked(true);
         } else {
@@ -93,6 +93,9 @@ public class UserServiceImpl implements UserService {
     public boolean updateUserPassword(PasswordChangeDTO passwordChangeDTO) {
         try {
             User user = userRepository.findByUsername(passwordChangeDTO.getUserName()).get();
+            if (!passwordEncoder.matches(passwordChangeDTO.getOldPassword(), user.getPassword())) {
+                return false;
+            }
             user.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
             userRepository.save(user);
             return true;

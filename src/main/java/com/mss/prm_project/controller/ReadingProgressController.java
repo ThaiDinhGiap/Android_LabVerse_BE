@@ -19,10 +19,13 @@ public class ReadingProgressController {
 
     @PostMapping("/create")
     public ResponseEntity<ReadingProgressDTO> createReadingProgress(
-            @RequestParam("collectionId") int collectionId,
+            @RequestParam(value = "collectionId", required = false) Integer collectionId,
             @RequestParam("paperId") int paperId,
             @RequestParam("lastReadPage") int lastReadPage,
             @RequestParam("totalPages") int totalPages) {
+        if (collectionId == null) {
+            collectionId = -1;
+        }
 
         ReadingProgressDTO readingProgressDTO = readingProgressService.createReadingProgressForUserAndPaper(collectionId, paperId, lastReadPage, totalPages);
 

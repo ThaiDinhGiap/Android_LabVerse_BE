@@ -31,7 +31,7 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUserName().get()).get();
         Paper paper = paperRepository.findById((long)paperId).orElse(null);
         Collection collection = collectionRepository.findById((long)collectionId).orElse(null);
-        if (Objects.nonNull(paper) && collectionId >0) {
+        if (Objects.nonNull(paper) || collectionId >0) {
             ReadingProgress readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperIdCollectionCollectionId(user.getUserId(), paperId, collectionId);
             if (readingProgress == null) {
                 readingProgress = new ReadingProgress();

@@ -130,7 +130,6 @@ public class PaperServiceImpl implements PaperService {
     @Override
     public PaperDTO findByPaperId(long paperId) {
         Paper paper = paperRepository.findById(paperId).orElseThrow(null);
-        return PaperMapper.INSTANCE.toDTO(paper);
         PaperDTO dto =  PaperMapper.INSTANCE.toDTO(paper);
         File file = fileRepository.findByPaperPaperId(paper.getPaperId());
         if (file != null) {
@@ -138,4 +137,73 @@ public class PaperServiceImpl implements PaperService {
         }
         return dto;
     }
+
+    // Build link DOI (không lưu DB)
+    public String doiLink(String doi) {
+        if (doi == null) return null;
+        String d = doi.trim();
+        return d.isEmpty() ? null : "https://doi.org/" + d;
+    }
+
+    public String toAPA(Paper p) {
+        String authors = apaAuthors(p.getAuthor());
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "n.d.";
+        String title = nz(p.getTitle());
+        String journal = nz(p.getJournal());
+        String link = (p.getDoi() != null && !p.getDoi().isBlank()) ? doiLink(p.getDoi()) : null;
+
+        return String.format("%s (%s). %s. %s.%s",
+                authors, year, title, journal,
+                link != null ? " " + link : "");
+    }
+
+    public String toMLA(Paper p) {
+        String authors = mlaAuthors(p.getAuthor());
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "";
+        String title = nz(p.getTitle());
+        String journal = nz(p.getJournal());
+        String link = (p.getDoi() != null && !p.getDoi().isBlank()) ? doiLink(p.getDoi()) : null;
+
+        // MLA bản demo: thêm link DOI nếu có
+        return String.format("%s \"%s.\" %s, %s.%s",
+                authors, title, journal, year,
+                link != null ? " " + link : "");
+    }
+
+    public String toBibTeX(Paper p) {
+        String key = buildBibKey(p);
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("@article{").append(key).append(",\n")
+                .append("  title = {").append(escape(nz(p.getTitle()))).append("},\n")
+                .append("  author = {").append(escape(nz(p.getAuthor()))).append("},\n");
+        if (p.getJournal() != null && !p.getJournal().isBlank())
+            sb.append("  journal = {").append(escape(p.getJournal())).append("},\n");
+        if (!year.isBlank())
+            sb.append("  year = {").append(year).append("},\n");
+        if (p.getDoi() != null && !p.getDoi().isBlank())
+            sb.append("  doi = {").append(escape(p.getDoi())).append("},\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    // ===== helpers =====
+    private String nz(String s){ return s == null ? "" : s; }
+    private String escape(String s){ return s.replace("{", "\\{").replace("}", "\\}"); }
+    private String buildBibKey(Paper p){
+        String last = safeLastName(p.getAuthor());
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "";
+        if (last.isBlank()) last = "Paper";
+        if (year.isBlank()) year = String.valueOf(System.currentTimeMillis());
+        return (last + year).replaceAll("\\s+", "");
+    }
+    private String safeLastName(String authorField){
+        if (authorField == null || authorField.isBlank()) return "";
+        String firstAuthor = authorField.split(";")[0].trim();
+        String[] parts = firstAuthor.split("\\s+");
+        return parts.length == 0 ? "" : parts[parts.length - 1];
+        // Bạn có thể cải tiến tách họ tên chuẩn hơn sau
+    }
+    private String apaAuthors(String s){ return nz(s); }
+    private String mlaAuthors(String s){ return nz(s); }
 }

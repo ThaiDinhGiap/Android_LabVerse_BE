@@ -42,6 +42,6 @@ public class ReadingProgress extends BaseEntity {
     Paper paper;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collection_id", nullable = false)
+    @JoinColumn(name = "collection_id")
     Collection collection;
 }

@@ -33,6 +33,8 @@ public interface PaperService {
     boolean deletePaper(long paperId);
 
     List<PaperDTO> getNewestAdded();
+
     PaperDTO findByPaperId(long paperId);
 
+    PaperDTO changePaperPriority(long paper, int priority);
 }

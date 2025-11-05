@@ -104,4 +104,11 @@ public class PaperController {
         FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
         return ResponseEntity.ok(result);
     }
+
+    @PutMapping("change-priority")
+    public ResponseEntity<PaperDTO> changePaperPriority(@RequestParam("paperId") long paperId, @RequestParam("priority") int priority) {
+        PaperDTO result = paperService.changePaperPriority(paperId, priority);
+        return ResponseEntity.ok(result);
+    }
+
 }

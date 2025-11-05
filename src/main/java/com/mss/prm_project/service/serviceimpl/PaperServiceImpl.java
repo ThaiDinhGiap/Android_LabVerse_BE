@@ -217,4 +217,12 @@ public class PaperServiceImpl implements PaperService {
         }
         return dto;
     }
+
+    @Override
+    public PaperDTO changePaperPriority(long paperId,  int priority) {
+        Paper paper = paperRepository.findById(paperId).orElseThrow(()-> new IllegalArgumentException("Paper not found"));
+        paper.setPriority(priority);
+        Paper savedPaper = paperRepository.save(paper);
+        return PaperMapper.INSTANCE.toDTO(savedPaper);
+    }
 }

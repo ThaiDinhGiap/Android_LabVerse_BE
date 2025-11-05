@@ -2,6 +2,7 @@ package com.mss.prm_project.service.serviceimpl;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.mss.prm_project.entity.*;
+import com.mss.prm_project.entity.Collection;
 import com.mss.prm_project.model.*;
 import com.mss.prm_project.repository.CollectionMemberRepository;
 import com.mss.prm_project.repository.CollectionRepository;
@@ -14,10 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 @Service
 public class CollectionServiceImpl implements CollectionService {
@@ -187,7 +185,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Transactional
     @Override
-    public CollectionDetailResponse getCollectionDetails(int collectionId, User user) {
+    public CollectionDetailResponse getCollectionDetails(int collectionId, int priority,User user) {
 
         collectionMemberRepository
                 .findByCollectionCollectionIdAndUserUserId(collectionId, user.getUserId())
@@ -206,8 +204,13 @@ public class CollectionServiceImpl implements CollectionService {
                     response.setStatus(member.getStatus());
                     return response;
                 }).collect(Collectors.toList());
-
-        List<SimplePaperResponse> paperResponses = collection.getPapers().stream()
+        List<Paper> collectionPapers = collection.getPapers();
+        if(priority != -1){
+            collectionPapers = collectionPapers.stream()
+                    .filter(paper -> paper.getPriority() == priority)
+                    .toList();
+        }
+        List<SimplePaperResponse> paperResponses = collectionPapers.stream()
                 .map(paper -> {
                     SimplePaperResponse response = new SimplePaperResponse();
                     response.setPaperId(paper.getPaperId());

@@ -37,11 +37,12 @@ public class CollectionController {
         return ResponseEntity.status(HttpStatus.OK).body(collectionResponse);
     }
 
-    @GetMapping("/{collectionId}")
+    @GetMapping("/detail")
     public ResponseEntity<CollectionDetailResponse> getCollectionDetails(
-            @PathVariable int collectionId,
+            @RequestParam("collectionId") int collectionId,
+            @RequestParam(value = "priority", required = false) int priority,
             @AuthenticationPrincipal User user){
-        CollectionDetailResponse collectionDetailResponse = collectionService.getCollectionDetails(collectionId, user);
+        CollectionDetailResponse collectionDetailResponse = collectionService.getCollectionDetails(collectionId, priority, user);
         return ResponseEntity.status(HttpStatus.OK).body(collectionDetailResponse);
     }
 

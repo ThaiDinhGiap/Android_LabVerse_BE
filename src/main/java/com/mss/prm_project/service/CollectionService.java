@@ -11,12 +11,19 @@ import java.util.List;
 
 public interface CollectionService {
     CollectionResponse createCollection(CollectionCreateRequest collectionCreateRequest, User user);
+
     List<CollectionResponse> getMyCollections(User user);
+
     CollectionResponse addPaperCollection(int collectionID, int paperId, User user) throws FirebaseMessagingException;
+
     void inviteMember(int collectionID, String invitedEmail, User user);
+
     CollectionMember acceptInvitation(int collectionId, User currentUser);
-    CollectionDetailResponse getCollectionDetails(int collectionId, User user);
+
+    CollectionDetailResponse getCollectionDetails(int collectionId, int priority, User user);
+
     String removePaperFromCollection(int collectionId, int paperId, User user);
+
     void rejectInvitation(int collectionId, User user);
 
 }

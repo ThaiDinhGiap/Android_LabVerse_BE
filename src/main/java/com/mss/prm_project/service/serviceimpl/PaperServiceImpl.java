@@ -201,14 +201,11 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public boolean deleteFavoritePaper(long paperId, long userId) {
-        Paper paper = favoritePaperRepository.findByUserUserIdAndPaperPaperId(userId, paperId).getPaper();
-        if (paper == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found");
-        }
-        paperRepository.delete(paper);
-        return true;
+    public List<PaperDTO> getNewestAdded() {
+        return null;
     }
+
+
 
     @Override
     public PaperDTO findByPaperId(long paperId) {

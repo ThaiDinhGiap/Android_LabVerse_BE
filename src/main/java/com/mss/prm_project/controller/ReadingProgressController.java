@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reading-progress")
@@ -17,14 +19,22 @@ public class ReadingProgressController {
 
     @PostMapping("/create")
     public ResponseEntity<ReadingProgressDTO> createReadingProgress(
-            @RequestParam Long userId,
-            @RequestParam Long paperId,
-            @RequestParam int lastReadPage,
-            @RequestParam int totalPages) {
+            @RequestParam("collectionId") int collectionId,
+            @RequestParam("paperId") int paperId,
+            @RequestParam("lastReadPage") int lastReadPage,
+            @RequestParam("totalPages") int totalPages) {
 
-        ReadingProgressDTO readingProgressDTO = readingProgressService.createReadingProgressForUserAndPaper(userId, paperId, lastReadPage, totalPages);
+        ReadingProgressDTO readingProgressDTO = readingProgressService.createReadingProgressForUserAndPaper(collectionId, paperId, lastReadPage, totalPages);
 
         return new ResponseEntity<>(readingProgressDTO, HttpStatus.CREATED);
     }
+
+    @GetMapping("/collection")
+    public ResponseEntity<List<ReadingProgressDTO>> getAllReadingProgressByCollection(@RequestParam("collectionId") int collectionId, @RequestParam(value = "paperId", defaultValue = "0") int paperId) {
+        List<ReadingProgressDTO> readingProgressDTOs = readingProgressService.getAllReadingProgressByCollection(collectionId, paperId);
+        return new ResponseEntity<>(readingProgressDTOs, HttpStatus.OK);
+    }
+
+
 
 }

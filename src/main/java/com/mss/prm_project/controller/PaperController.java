@@ -57,6 +57,12 @@ public class PaperController {
         return ResponseEntity.ok(papers);
     }
 
+    @GetMapping("/newest-add")
+    public ResponseEntity<List<PaperDTO>> getNewestAdded(@RequestParam int userId) {
+        List<PaperDTO> papers = paperService.getNewestAdded();
+        return ResponseEntity.ok(papers);
+    }
+
 //    @GetMapping("/list-papers-for-PIs")
 //    public ResponseEntity<List<?>> getPapersByUserIdWithPIRole(@RequestParam int userId){
 //        List<PaperDTO> paperDTOs = paperService.getPaperByUserId(userId);

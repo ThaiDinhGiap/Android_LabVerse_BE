@@ -1,13 +1,18 @@
 package com.mss.prm_project.model;
 
-import lombok.Data;
+
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NonNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CollectionCreateRequest {
 
-    @NonNull
     private String name;
+    private String description;
+
 }

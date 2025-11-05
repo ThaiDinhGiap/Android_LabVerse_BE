@@ -38,8 +38,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).get();
         return userRepository.findByEmail(email)
+
                 .map(UserMapper.INSTANCE::userToUserDTO);
+
     }
 
     @Override
@@ -75,8 +78,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username).get();
         ProfileDTO profileDTO = new ProfileDTO();
         profileDTO.setName(user.getFullName());
-        profileDTO.setEmailNotifications(user.isEmailNotifications());
-        profileDTO.setPushNotifications(user.isPushNotifications());
+        profileDTO.setEmail(user.getEmail());
+        profileDTO.setInstantPushNotification(user.isInstantPushNotification());
+        profileDTO.setScheduledPushNotification(user.isScheduledPushNotification());
+        if (user.getGoogleSub() != null) {
+            profileDTO.setGoogleLinked(true);
+        } else {
+            profileDTO.setGoogleLinked(false);
+        }
         return profileDTO;
     }
 
@@ -84,6 +93,9 @@ public class UserServiceImpl implements UserService {
     public boolean updateUserPassword(PasswordChangeDTO passwordChangeDTO) {
         try {
             User user = userRepository.findByUsername(passwordChangeDTO.getUserName()).get();
+            if (!passwordEncoder.matches(passwordChangeDTO.getOldPassword(), user.getPassword())) {
+                return false;
+            }
             user.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
             userRepository.save(user);
             return true;
@@ -96,8 +108,8 @@ public class UserServiceImpl implements UserService {
     public boolean updateNotificationPreferences(SettingDTO settingDTO) {
         try {
             User user = userRepository.findByUsername(settingDTO.getUserName()).get();
-            user.setEmailNotifications(settingDTO.isEmailNotifications());
-            user.setPushNotifications(settingDTO.isPushNotifications());
+            user.setInstantPushNotification(settingDTO.isInstantNotification());
+            user.setScheduledPushNotification(settingDTO.isScheduledNotification());
             userRepository.save(user);
             return true;
         } catch (Exception e) {
@@ -106,8 +118,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ProfileDTO updateProfile(ProfileDTO profileDTO) {
+    public ProfileDTO updateProfile(ProfileDTO profileDTO) throws Exception {
         User user = userRepository.findByUsername(profileDTO.getUserName()).get();
+        String newEmail = profileDTO.getEmail();
+        String oldEmail = user.getEmail();
+
+        if (!oldEmail.equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+            throw new Exception("Email already in use!");
+        }
+
+        if (!oldEmail.equals(newEmail)) {
+            user.setEmail(newEmail);
+            user.setGoogleSub(null);
+        }
+
         user.setFullName(profileDTO.getName());
         userRepository.save(user);
         return profileDTO;

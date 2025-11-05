@@ -3,8 +3,9 @@ package com.mss.prm_project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -32,13 +33,13 @@ public class Annotation extends BaseEntity{
             joinColumns = @JoinColumn(name = "annotation_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    Set<User> readers = new HashSet<>();
+    List<User> readers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     User owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "paper_id", nullable = false)
     Paper paper;
 

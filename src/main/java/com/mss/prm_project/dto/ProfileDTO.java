@@ -5,8 +5,10 @@ import lombok.Data;
 @Data
 public class ProfileDTO {
     private String userName;
+    private String email;
     private String name;
     private String affiliation;
-    private boolean pushNotifications;
-    private boolean emailNotifications;
+    private boolean instantPushNotification;
+    private boolean scheduledPushNotification;
+    private boolean isGoogleLinked;
 }

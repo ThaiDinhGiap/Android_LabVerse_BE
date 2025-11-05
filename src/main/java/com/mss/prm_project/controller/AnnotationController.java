@@ -23,27 +23,27 @@ public class AnnotationController {
 
     // API chia sẻ quyền đọc cho user
     @PostMapping()
-    public ResponseEntity<Set<UserDTO>> shareReaderToAnnotation(
-            @RequestParam("annotationId") long annotationId,
-            @RequestParam("userId") long userId) {
-        Set<UserDTO> updatedReaders = annotationService.shareReaderToAnnotation(annotationId, userId);
+    public ResponseEntity<List<UserDTO>> shareAnnotationToOther(
+            @RequestParam("paperId") int paperId,
+            @RequestParam("userIdList") List<Long> userIdList) {
+        List<UserDTO> updatedReaders = annotationService.shareAnnotationToOther(paperId, userIdList);
         return ResponseEntity.ok(updatedReaders);
     }
 
     // API xóa quyền đọc của user
     @DeleteMapping("/{annotationId}/remove/{userId}")
-    public ResponseEntity<Set<UserDTO>> removeReaderFromAnnotation(
+    public ResponseEntity<List<UserDTO>> removeReaderFromAnnotation(
             @PathVariable long annotationId,
             @PathVariable long userId) {
-        Set<UserDTO> updatedReaders = annotationService.removeReaderFromAnnotation(annotationId, userId);
+        List<UserDTO> updatedReaders = annotationService.removeReaderFromAnnotation(annotationId, userId);
         return ResponseEntity.ok(updatedReaders);
     }
 
     // API lấy tất cả các Annotation mà user có quyền đọc
-    @GetMapping("/readable/{userId}")
+    @GetMapping("/readable")
     public ResponseEntity<List<AnnotationDTO>> findAllReadableAnnotationByUserId(
-            @PathVariable long userId) {
-        List<AnnotationDTO> annotations = annotationService.findAllReadableAnnotationByUserId(userId);
+            @RequestParam("collectionId") int collectionId, @RequestParam("paperId") long paperId) {
+        List<AnnotationDTO> annotations = annotationService.findAllReadableAnnotationByUserId(collectionId, paperId);
         return ResponseEntity.ok(annotations);
     }
 
@@ -71,5 +71,11 @@ public class AnnotationController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<AnnotationDTO> importAnnotationFromOtherMember(@RequestParam("annotationId") long annotationId) {
+        AnnotationDTO importedAnnotation = annotationService.importAnnotationFromOtherMember(annotationId);
+        return ResponseEntity.status(201).body(importedAnnotation);
     }
 }

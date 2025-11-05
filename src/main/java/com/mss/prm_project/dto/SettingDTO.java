@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class SettingDTO {
     private String userName;
-    private boolean pushNotifications;
-    private boolean emailNotifications;
+    private boolean instantNotification;
+    private boolean scheduledNotification;
 }

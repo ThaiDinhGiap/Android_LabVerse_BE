@@ -10,6 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,17 +32,17 @@ public interface AnnotationMapper {
 
     // ====== Helper methods ======
 
-    default Set<UserDTO> mapReadersToDTO(Set<User> readers) {
+    default List<UserDTO> mapReadersToDTO(List<User> readers) {
         if (readers == null) return null;
         return readers.stream()
                 .map(UserMapper.INSTANCE::userToUserDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
-    default Set<User> mapDTOToReaders(Set<UserDTO> readerDTOs) {
+    default List<User> mapDTOToReaders(List<UserDTO> readerDTOs) {
         if (readerDTOs == null) return null;
         return readerDTOs.stream()
                 .map(UserMapper.INSTANCE::userDTOToUser)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 }

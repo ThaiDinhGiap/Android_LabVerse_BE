@@ -58,15 +58,8 @@ public class AuthenticationController {
 
     @PostMapping("/link")
     public ResponseEntity<Void> link(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestParam long userId,
             @RequestBody @Valid GoogleLoginRequest req) throws Exception {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "MISSING_TOKEN");
-        }
-
-        String token = authHeader.substring(7);
-        long userId = jwtService.extractUserId(token);
 
         googleService.linkGoogleAccount(userId, req);
         return ResponseEntity.noContent().build();

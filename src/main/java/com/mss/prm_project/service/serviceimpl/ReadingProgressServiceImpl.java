@@ -29,31 +29,35 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
     @Override
     public ReadingProgressDTO createReadingProgressForUserAndPaper(int collectionId, int paperId, int lastReadPage, int totalPages) {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUserName().get()).get();
-        Paper paper = paperRepository.findById((long)paperId).orElse(null);
+        Paper paper = paperRepository.findById((long)paperId).orElseThrow(()-> new IllegalArgumentException("Paper not found"));
         Collection collection = collectionRepository.findById((long)collectionId).orElse(null);
-        if (Objects.nonNull(paper) || collectionId >0) {
-            ReadingProgress readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperIdCollectionCollectionId(user.getUserId(), paperId, collectionId);
-            if (readingProgress == null) {
-                readingProgress = new ReadingProgress();
-                readingProgress.setUser(user);
-                readingProgress.setPaper(paper);
-                readingProgress.setLatestPage(lastReadPage);
-                readingProgress.setCollection(collection);
-                readingProgress.setProgressStatus("To Read");
-            }
-            else {
-                if(lastReadPage > readingProgress.getLatestPage()){
-                    readingProgress.setLatestPage(lastReadPage);
-                    BigDecimal completionPercent = BigDecimal.valueOf(((double) lastReadPage / totalPages) * 100);
-                    readingProgress.setCompletionPercent(completionPercent);
-                }
-                String progressStatus = (lastReadPage == totalPages) ? "Completed" : "Reading";
-                readingProgress.setProgressStatus(progressStatus);
-            }
-            ReadingProgress savedProgress = readingProgressRepository.save(readingProgress);
-            return ReadingProgressMapper.INSTANCE.toDTO(savedProgress);
+        ReadingProgress readingProgress = new ReadingProgress();
+        if (collectionId >0) {
+            readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperIdCollectionCollectionId(user.getUserId(), paperId, collectionId);
+        }else {
+            readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperId(user.getUserId(), paperId);
         }
-        return null;
+        if (readingProgress == null) {
+            readingProgress = new ReadingProgress();
+            readingProgress.setUser(user);
+            readingProgress.setPaper(paper);
+            readingProgress.setLatestPage(lastReadPage);
+            if(Objects.nonNull(collection)) {
+                readingProgress.setCollection(collection);
+            }
+            readingProgress.setProgressStatus("To Read");
+        }
+        else {
+            if(lastReadPage > readingProgress.getLatestPage()){
+                readingProgress.setLatestPage(lastReadPage);
+                BigDecimal completionPercent = BigDecimal.valueOf(((double) lastReadPage / totalPages) * 100);
+                readingProgress.setCompletionPercent(completionPercent);
+            }
+            String progressStatus = (lastReadPage == totalPages) ? "Completed" : "Reading";
+            readingProgress.setProgressStatus(progressStatus);
+        }
+        ReadingProgress savedProgress = readingProgressRepository.save(readingProgress);
+        return ReadingProgressMapper.INSTANCE.toDTO(savedProgress);
     }
 
     @Override

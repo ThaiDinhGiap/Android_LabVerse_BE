@@ -1,5 +1,6 @@
 package com.mss.prm_project.service.serviceimpl;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.mss.prm_project.entity.*;
 import com.mss.prm_project.model.*;
 import com.mss.prm_project.repository.CollectionMemberRepository;
@@ -7,12 +8,15 @@ import com.mss.prm_project.repository.CollectionRepository;
 import com.mss.prm_project.repository.PaperRepository;
 import com.mss.prm_project.repository.UserRepository;
 import com.mss.prm_project.service.CollectionService;
+import com.mss.prm_project.service.FcmService;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 @Service
@@ -22,12 +26,14 @@ public class CollectionServiceImpl implements CollectionService {
     private final UserRepository userRepository;
     private final PaperRepository paperRepository;
     private final CollectionMemberRepository  collectionMemberRepository;
+    private final FcmService fcm;
 
-    public CollectionServiceImpl(CollectionRepository collectionRepository, UserRepository userRepository, PaperRepository paperRepository, CollectionMemberRepository collectionMemberRepository) {
+    public CollectionServiceImpl(CollectionRepository collectionRepository, UserRepository userRepository, PaperRepository paperRepository, CollectionMemberRepository collectionMemberRepository, FcmService fcm) {
         this.collectionRepository = collectionRepository;
         this.userRepository = userRepository;
         this.paperRepository = paperRepository;
         this.collectionMemberRepository = collectionMemberRepository;
+        this.fcm = fcm;
     }
 
     @Transactional
@@ -83,7 +89,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Transactional
     @Override
-    public CollectionResponse addPaperCollection(int collectionID, int paperId, User user) {
+    public CollectionResponse addPaperCollection(int collectionID, int paperId, User user) throws FirebaseMessagingException {
 
         boolean isJoined = collectionMemberRepository
                 .findByCollectionCollectionIdAndUserUserIdAndStatus(collectionID, user.getUserId(), CollectionMember.JoinStatus.JOINED)
@@ -95,8 +101,23 @@ public class CollectionServiceImpl implements CollectionService {
         Paper paper = paperRepository.findByPaperId(paperId);
 
         collection.getPapers().add(paper);
-
         collectionRepository.save(collection);
+
+        List<User> users = collection.getMembers().stream()
+                .map(CollectionMember::getUser)
+                .filter(User::isInstantPushNotification)
+                .toList();
+        for (User u : users) {
+            if (u.getFcmToken() == null || u.getFcmToken().isBlank()) continue;
+
+            Map<String, String> data = new HashMap<>();
+            data.put("type", "instant");
+            data.put("paperId", String.valueOf(paper.getPaperId()));
+            fcm.sendNotificationToToken(u.getFcmToken(),
+                    "New paper: " + paper.getTitle(),
+                    "Matches your interests — tap to read.",
+                    data);
+        }
 
         CollectionResponse collectionResponse = new CollectionResponse();
         collectionResponse.setCollectionId(collection.getCollectionId());

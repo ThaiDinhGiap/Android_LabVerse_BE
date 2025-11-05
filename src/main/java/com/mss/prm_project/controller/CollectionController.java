@@ -49,7 +49,7 @@ public class CollectionController {
     public ResponseEntity<CollectionResponse> addPaper(
             @PathVariable int collectionId,
             @RequestBody AddPaperRequest request,
-            @AuthenticationPrincipal User user){
+            @AuthenticationPrincipal User user) throws FirebaseMessagingException {
 
         System.out.println(collectionId + String.valueOf(request));
         System.out.println(request.getPaperId());

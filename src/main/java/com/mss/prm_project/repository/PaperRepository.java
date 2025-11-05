@@ -48,7 +48,7 @@ public interface PaperRepository extends JpaRepository<Paper, Long> {
     @Query("SELECT p FROM Paper p WHERE p.updatedAt > :lastSync")
     List<Paper> findAllUpdatedAfter(@Param("lastSync") LocalDateTime lastSync);
 
-
-
     Paper findByPaperId(int paperId);
+
+    List<Paper> findByPublishDateAfter(LocalDateTime lastSync);
 }

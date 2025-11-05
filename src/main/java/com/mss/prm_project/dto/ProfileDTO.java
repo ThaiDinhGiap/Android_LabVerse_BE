@@ -8,7 +8,7 @@ public class ProfileDTO {
     private String email;
     private String name;
     private String affiliation;
-    private boolean instantNotification;
-    private boolean scheduledNotification;
+    private boolean instantPushNotification;
+    private boolean scheduledPushNotification;
     private boolean isGoogleLinked;
 }

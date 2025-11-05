@@ -38,6 +38,9 @@ public class ReadingProgressController {
         return new ResponseEntity<>(readingProgressDTOs, HttpStatus.OK);
     }
 
-
-
+    @GetMapping()
+    public ResponseEntity<List<ReadingProgressDTO>> getPersonalReadingProgress() {
+        List<ReadingProgressDTO> results =  readingProgressService.getPersonalReadingProgress();
+        return new ResponseEntity<>(results, HttpStatus.OK);
+    }
 }

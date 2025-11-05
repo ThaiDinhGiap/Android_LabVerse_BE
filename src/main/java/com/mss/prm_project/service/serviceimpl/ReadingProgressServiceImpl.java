@@ -71,4 +71,12 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         List<ReadingProgress> readingProgressList = readingProgressRepository.getAllReadingProgressByCollectionCollectionId(collectionId);
         return readingProgressList.stream().map(ReadingProgressMapper.INSTANCE::toDTO).collect(Collectors.toList());
     }
+
+    @Override
+    public List<ReadingProgressDTO> getPersonalReadingProgress() {
+        User user = userRepository.findByUsername(SecurityUtils.getCurrentUserName().get()).
+                                    orElseThrow(()-> new IllegalArgumentException("User not found"));
+        List<ReadingProgress> readingProgressList = readingProgressRepository.getAllByUserUserId(user.getUserId());
+        return readingProgressList.stream().map(ReadingProgressMapper.INSTANCE::toDTO).collect(Collectors.toList());
+    }
 }

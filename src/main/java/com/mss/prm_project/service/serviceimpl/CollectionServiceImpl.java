@@ -180,7 +180,7 @@ public class CollectionServiceImpl implements CollectionService {
         collectionMember.setUser(invitedUser);
 
         collectionMember.setRole(CollectionMember.MemberRole.MEMBER);
-        collectionMember.setStatus(CollectionMember.JoinStatus.PENDING);
+        collectionMember.setStatus(CollectionMember.JoinStatus.JOINED);
 
         collectionMemberRepository.save(collectionMember);
     }

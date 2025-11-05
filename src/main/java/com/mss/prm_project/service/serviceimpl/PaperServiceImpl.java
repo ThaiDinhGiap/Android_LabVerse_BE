@@ -1,7 +1,6 @@
 package com.mss.prm_project.service.serviceimpl;
 
 import com.mss.prm_project.dto.FavoritePaperDTO;
-import com.mss.prm_project.dto.FileDTO;
 import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.*;
 import com.mss.prm_project.mapper.FavouriteMapper;
@@ -30,7 +29,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +46,11 @@ public class PaperServiceImpl implements PaperService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         return paperRepository.findUnreadByUser(userId).stream().map(PaperMapper.INSTANCE::toDTO).toList();
+    }
+
+    @Override
+    public Paper getPaperById(int paperId) {
+        return paperRepository.findByPaperId(paperId);
     }
 
 //    @Override
@@ -73,13 +76,22 @@ public class PaperServiceImpl implements PaperService {
         file.setFileUrl(s3ServiceV2.uploadFile(multipartFile));
 //        file.setFileUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
         File savedfile = fileRepository.save(file);
+
         Paper paper = PaperMapper.INSTANCE.toEntity(dto);
+
         String username = SecurityUtils.getCurrentUserName().get();
         User user = userRepository.findByUsername(username).get();
         paper.setUser(user);
+
+        paper.setCitationApa(toAPA(paper));
+        paper.setCitationMla(toMLA(paper));
+        paper.setCitationBibtex(toBibTeX(paper));
+
         Paper savedPaper = paperRepository.save(paper);
+
         savedfile.setPaper(savedPaper);
         fileRepository.save(savedfile);
+
         return PaperMapper.INSTANCE.toDTO(savedPaper);
     }
 

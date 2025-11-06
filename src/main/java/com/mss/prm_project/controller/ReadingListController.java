@@ -52,10 +52,10 @@ public class ReadingListController {
     // GET /api/readinglists/{listId}
     // -----------------------------------------------------------------------
     @GetMapping("/{listId}")
-    public ResponseEntity<ReadingListDetailResponse> getListDetails(
+    public ResponseEntity<ReadingListPaperDetailResponse> getListDetails(
             @PathVariable int listId,
             @AuthenticationPrincipal User user) {
-        ReadingListDetailResponse detailResponse = readingListService.getListDetails(listId);
+        ReadingListPaperDetailResponse detailResponse = readingListService.getListDetails(listId);
         return ResponseEntity.status(HttpStatus.OK).body(detailResponse); // 200 OK
     }
 

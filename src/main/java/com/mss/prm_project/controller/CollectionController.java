@@ -40,7 +40,7 @@ public class CollectionController {
     @GetMapping("/detail")
     public ResponseEntity<CollectionDetailResponse> getCollectionDetails(
             @RequestParam("collectionId") int collectionId,
-            @RequestParam(value = "priority", required = false) int priority,
+            @RequestParam(value = "priority", required = false) Integer priority,
             @AuthenticationPrincipal User user){
         CollectionDetailResponse collectionDetailResponse = collectionService.getCollectionDetails(collectionId, priority, user);
         return ResponseEntity.status(HttpStatus.OK).body(collectionDetailResponse);

@@ -185,7 +185,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Transactional
     @Override
-    public CollectionDetailResponse getCollectionDetails(int collectionId, int priority,User user) {
+    public CollectionDetailResponse getCollectionDetails(int collectionId, Integer priority,User user) {
 
         collectionMemberRepository
                 .findByCollectionCollectionIdAndUserUserId(collectionId, user.getUserId())
@@ -205,7 +205,7 @@ public class CollectionServiceImpl implements CollectionService {
                     return response;
                 }).collect(Collectors.toList());
         List<Paper> collectionPapers = collection.getPapers();
-        if(priority != -1){
+        if(Objects.nonNull(priority)){
             collectionPapers = collectionPapers.stream()
                     .filter(paper -> paper.getPriority() == priority)
                     .toList();

@@ -20,7 +20,7 @@ public interface CollectionService {
 
     CollectionMember acceptInvitation(int collectionId, User currentUser);
 
-    CollectionDetailResponse getCollectionDetails(int collectionId, int priority, User user);
+    CollectionDetailResponse getCollectionDetails(int collectionId, Integer priority, User user);
 
     String removePaperFromCollection(int collectionId, int paperId, User user);
 

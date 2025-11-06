@@ -6,6 +6,7 @@ import com.mss.prm_project.entity.ReadingList;
 import com.mss.prm_project.entity.User;
 import com.mss.prm_project.model.PaperResponse;
 import com.mss.prm_project.model.ReadingListDetailResponse;
+import com.mss.prm_project.model.ReadingListPaperDetailResponse;
 import com.mss.prm_project.model.ReadingListResponse;
 import com.mss.prm_project.repository.PaperRepository;
 import com.mss.prm_project.repository.ReadingListRepository;
@@ -73,7 +74,11 @@ public class ReadingListServiceImpl implements ReadingListService {
 
     @Override
     public List<ReadingListResponse> getListsByOwner(int userId) {
-        List<ReadingList> readingLists = readingListRepository.findByOwnerUserUserId(userId);
+        List<ReadingList> readingLists =
+                readingListRepository.findDistinctByOwnerUserUserIdOrViewersUserId(userId, userId);
+
+//        List<ReadingList> readingLists = readingListRepository.findByOwnerUserUserId(userId);
+
         return readingLists.stream()
                 .map(readingList -> {
                     ReadingListResponse response = new ReadingListResponse();
@@ -88,12 +93,12 @@ public class ReadingListServiceImpl implements ReadingListService {
     }
 
     @Override
-    public ReadingListDetailResponse getListDetails(int listId) {
+    public ReadingListPaperDetailResponse getListDetails(int listId) {
         ReadingList list = readingListRepository.findByIdWithPapers(listId)
                 .orElseThrow(() -> new RuntimeException("Reading List not found."));
 
         // Ánh xạ trực tiếp từ Entity sang Detail DTO
-        ReadingListDetailResponse response = new ReadingListDetailResponse();
+        ReadingListPaperDetailResponse response = new ReadingListPaperDetailResponse();
         response.setReadingId(list.getReadingId());
         response.setName(list.getName());
         response.setDescription(list.getDescription());
@@ -101,13 +106,15 @@ public class ReadingListServiceImpl implements ReadingListService {
         response.setOwnerUsername(list.getOwnerUser().getUsername());
 
         // Ánh xạ Papers
-        List<PaperResponse> paperResponses = list.getPapers().stream()
+        List<PaperDTO> paperResponses = list.getPapers().stream()
                 .map(lists ->{
-                    PaperResponse paperDTO = new PaperResponse();
-                    paperDTO.setPaperId(lists.getPaperId());
+                    PaperDTO paperDTO = new PaperDTO();
+                    paperDTO.setId(lists.getPaperId());
                     paperDTO.setTitle(lists.getTitle());
-                    paperDTO.setAuthor(lists.getAuthor());
+                    paperDTO.setPriority(lists.getPriority());
+                    paperDTO.setPublishDate(lists.getPublishDate());
                     paperDTO.setJournal(lists.getJournal());
+                    paperDTO.setPublisher(lists.getPublisher());
                     return paperDTO;
                 })
                 .collect(Collectors.toList());

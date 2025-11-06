@@ -19,6 +19,8 @@ public interface ReadingListRepository extends JpaRepository<ReadingList, Long> 
     // 3. Kiểm tra quyền sở hữu
     Optional<ReadingList> findByReadingIdAndOwnerUserUserId(int listId, int ownerId);
 
+    List<ReadingList> findDistinctByOwnerUserUserIdOrViewersUserId(int ownerId, int viewerId);
+
 
     @Query(value = """
         SELECT COUNT(*) 

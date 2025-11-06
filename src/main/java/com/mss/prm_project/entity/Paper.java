@@ -56,4 +56,21 @@ public class Paper extends  BaseEntity {
     @ManyToMany(mappedBy = "papers")
     private List<ReadingList> readingLists = new ArrayList<>();
 
+    // NEW: store pre-rendered citations
+    @Lob
+    @Column(name = "citation_apa", columnDefinition = "LONGTEXT")
+    private String citationApa;
+
+    @Lob
+    @Column(name = "citation_mla", columnDefinition = "LONGTEXT")
+    private String citationMla;
+
+    @Lob
+    @Column(name = "citation_bibtex", columnDefinition = "LONGTEXT")
+    private String citationBibtex;
+
+    // (tùy chọn, hữu ích)
+    @Column(name = "doi", columnDefinition = "varchar(255)")
+    private String doi;
+
 }

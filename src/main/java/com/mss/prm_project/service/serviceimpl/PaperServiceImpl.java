@@ -1,7 +1,6 @@
 package com.mss.prm_project.service.serviceimpl;
 
 import com.mss.prm_project.dto.FavoritePaperDTO;
-import com.mss.prm_project.dto.FileDTO;
 import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.*;
 import com.mss.prm_project.mapper.FavouriteMapper;
@@ -30,7 +29,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +46,11 @@ public class PaperServiceImpl implements PaperService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
         return paperRepository.findUnreadByUser(userId).stream().map(PaperMapper.INSTANCE::toDTO).toList();
+    }
+
+    @Override
+    public Paper getPaperById(int paperId) {
+        return paperRepository.findByPaperId(paperId);
     }
 
 //    @Override
@@ -73,13 +76,22 @@ public class PaperServiceImpl implements PaperService {
         file.setFileUrl(s3ServiceV2.uploadFile(multipartFile));
 //        file.setFileUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
         File savedfile = fileRepository.save(file);
+
         Paper paper = PaperMapper.INSTANCE.toEntity(dto);
+
         String username = SecurityUtils.getCurrentUserName().get();
         User user = userRepository.findByUsername(username).get();
         paper.setUser(user);
+
+        paper.setCitationApa(toAPA(paper));
+        paper.setCitationMla(toMLA(paper));
+        paper.setCitationBibtex(toBibTeX(paper));
+
         Paper savedPaper = paperRepository.save(paper);
+
         savedfile.setPaper(savedPaper);
         fileRepository.save(savedfile);
+
         return PaperMapper.INSTANCE.toDTO(savedPaper);
     }
 
@@ -225,4 +237,73 @@ public class PaperServiceImpl implements PaperService {
         Paper savedPaper = paperRepository.save(paper);
         return PaperMapper.INSTANCE.toDTO(savedPaper);
     }
+
+    // Build link DOI (không lưu DB)
+    public String doiLink(String doi) {
+        if (doi == null) return null;
+        String d = doi.trim();
+        return d.isEmpty() ? null : "https://doi.org/" + d;
+    }
+
+    public String toAPA(Paper p) {
+        String authors = apaAuthors(p.getAuthor());
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "n.d.";
+        String title = nz(p.getTitle());
+        String journal = nz(p.getJournal());
+        String link = (p.getDoi() != null && !p.getDoi().isBlank()) ? doiLink(p.getDoi()) : null;
+
+        return String.format("%s (%s). %s. %s.%s",
+                authors, year, title, journal,
+                link != null ? " " + link : "");
+    }
+
+    public String toMLA(Paper p) {
+        String authors = mlaAuthors(p.getAuthor());
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "";
+        String title = nz(p.getTitle());
+        String journal = nz(p.getJournal());
+        String link = (p.getDoi() != null && !p.getDoi().isBlank()) ? doiLink(p.getDoi()) : null;
+
+        // MLA bản demo: thêm link DOI nếu có
+        return String.format("%s \"%s.\" %s, %s.%s",
+                authors, title, journal, year,
+                link != null ? " " + link : "");
+    }
+
+    public String toBibTeX(Paper p) {
+        String key = buildBibKey(p);
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("@article{").append(key).append(",\n")
+                .append("  title = {").append(escape(nz(p.getTitle()))).append("},\n")
+                .append("  author = {").append(escape(nz(p.getAuthor()))).append("},\n");
+        if (p.getJournal() != null && !p.getJournal().isBlank())
+            sb.append("  journal = {").append(escape(p.getJournal())).append("},\n");
+        if (!year.isBlank())
+            sb.append("  year = {").append(year).append("},\n");
+        if (p.getDoi() != null && !p.getDoi().isBlank())
+            sb.append("  doi = {").append(escape(p.getDoi())).append("},\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    // ===== helpers =====
+    private String nz(String s){ return s == null ? "" : s; }
+    private String escape(String s){ return s.replace("{", "\\{").replace("}", "\\}"); }
+    private String buildBibKey(Paper p){
+        String last = safeLastName(p.getAuthor());
+        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "";
+        if (last.isBlank()) last = "Paper";
+        if (year.isBlank()) year = String.valueOf(System.currentTimeMillis());
+        return (last + year).replaceAll("\\s+", "");
+    }
+    private String safeLastName(String authorField){
+        if (authorField == null || authorField.isBlank()) return "";
+        String firstAuthor = authorField.split(";")[0].trim();
+        String[] parts = firstAuthor.split("\\s+");
+        return parts.length == 0 ? "" : parts[parts.length - 1];
+        // Bạn có thể cải tiến tách họ tên chuẩn hơn sau
+    }
+    private String apaAuthors(String s){ return nz(s); }
+    private String mlaAuthors(String s){ return nz(s); }
 }

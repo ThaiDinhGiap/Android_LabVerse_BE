@@ -16,4 +16,5 @@ public class PaperDTO extends BaseDTO{
     int priority;
     UserDTO user;
     String fileUrl;
+    String doi;
 }

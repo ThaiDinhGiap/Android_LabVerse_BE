@@ -2,6 +2,7 @@ package com.mss.prm_project.controller;
 
 import com.mss.prm_project.dto.FavoritePaperDTO;
 import com.mss.prm_project.dto.PaperDTO;
+import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.service.PaperService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -110,5 +111,21 @@ public class PaperController {
         PaperDTO result = paperService.changePaperPriority(paperId, priority);
         return ResponseEntity.ok(result);
     }
+
+
+    @GetMapping("/{id}/citation")
+    public ResponseEntity<String> getCitation(@PathVariable int id, @RequestParam String style) {
+        Paper p = paperService.getPaperById(id);
+        String body = switch (style.toLowerCase()) {
+            case "apa" -> n(p.getCitationApa());
+            case "mla" -> n(p.getCitationMla());
+            case "bibtex" -> n(p.getCitationBibtex());
+            default -> "";
+        };
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/plain; charset=UTF-8")
+                .body(body);
+    }
+    private String n(String s){ return s == null ? "" : s; }
 
 }

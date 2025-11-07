@@ -11,6 +11,7 @@ public class PaperDTO extends BaseDTO{
     String title;
     String journal;
     String publisher;
+    String author;
     LocalDateTime publishDate;
     boolean isOffline;
     int priority;

@@ -19,7 +19,7 @@ public class ReadingProgressController {
 
     @PostMapping("/create")
     public ResponseEntity<ReadingProgressDTO> createReadingProgress(
-            @RequestParam(value = "collectionId", required = false) int collectionId,
+            @RequestParam(value = "collectionId", defaultValue = "-1") int collectionId,
             @RequestParam("paperId") int paperId,
             @RequestParam("lastReadPage") int lastReadPage,
             @RequestParam("totalPages") int totalPages) {
@@ -28,9 +28,15 @@ public class ReadingProgressController {
         return new ResponseEntity<>(readingProgressDTO, HttpStatus.CREATED);
     }
 
+//    @GetMapping("/collection")
+//    public ResponseEntity<List<ReadingProgressDTO>> getAllReadingProgressByCollection(@RequestParam("collectionId") int collectionId, @RequestParam(value = "paperId", defaultValue = "0") int paperId) {
+//        List<ReadingProgressDTO> readingProgressDTOs = readingProgressService.getAllReadingProgressByCollection(collectionId, paperId);
+//        return new ResponseEntity<>(readingProgressDTOs, HttpStatus.OK);
+//    }
+
     @GetMapping("/collection")
-    public ResponseEntity<List<ReadingProgressDTO>> getAllReadingProgressByCollection(@RequestParam("collectionId") int collectionId, @RequestParam(value = "paperId", defaultValue = "0") int paperId) {
-        List<ReadingProgressDTO> readingProgressDTOs = readingProgressService.getAllReadingProgressByCollection(collectionId, paperId);
+    public ResponseEntity<List<ReadingProgressDTO>> getAllReadingProgressByCollection(@RequestParam("collectionId") int collectionId) {
+        List<ReadingProgressDTO> readingProgressDTOs = readingProgressService.getAllReadingProgressByCollection(collectionId);
         return new ResponseEntity<>(readingProgressDTOs, HttpStatus.OK);
     }
 

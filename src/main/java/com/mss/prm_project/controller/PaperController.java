@@ -58,6 +58,12 @@ public class PaperController {
         return ResponseEntity.ok(papers);
     }
 
+    @GetMapping("/newest-add")
+    public ResponseEntity<List<PaperDTO>> getNewestAdded(@RequestParam int userId) {
+        List<PaperDTO> papers = paperService.getNewestAdded();
+        return ResponseEntity.ok(papers);
+    }
+
 //    @GetMapping("/list-papers-for-PIs")
 //    public ResponseEntity<List<?>> getPapersByUserIdWithPIRole(@RequestParam int userId){
 //        List<PaperDTO> paperDTOs = paperService.getPaperByUserId(userId);
@@ -99,6 +105,13 @@ public class PaperController {
         FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
         return ResponseEntity.ok(result);
     }
+
+    @PutMapping("change-priority")
+    public ResponseEntity<PaperDTO> changePaperPriority(@RequestParam("paperId") long paperId, @RequestParam("priority") int priority) {
+        PaperDTO result = paperService.changePaperPriority(paperId, priority);
+        return ResponseEntity.ok(result);
+    }
+
 
     @GetMapping("/{id}/citation")
     public ResponseEntity<String> getCitation(@PathVariable int id, @RequestParam String style) {

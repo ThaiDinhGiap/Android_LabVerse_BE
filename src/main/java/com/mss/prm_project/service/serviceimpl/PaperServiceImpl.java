@@ -213,14 +213,11 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public boolean deleteFavoritePaper(long paperId, long userId) {
-        Paper paper = favoritePaperRepository.findByUserUserIdAndPaperPaperId(userId, paperId).getPaper();
-        if (paper == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found");
-        }
-        paperRepository.delete(paper);
-        return true;
+    public List<PaperDTO> getNewestAdded() {
+        return null;
     }
+
+
 
     @Override
     public PaperDTO findByPaperId(long paperId) {
@@ -231,6 +228,14 @@ public class PaperServiceImpl implements PaperService {
             dto.setFileUrl(file.getFileUrl());
         }
         return dto;
+    }
+
+    @Override
+    public PaperDTO changePaperPriority(long paperId,  int priority) {
+        Paper paper = paperRepository.findById(paperId).orElseThrow(()-> new IllegalArgumentException("Paper not found"));
+        paper.setPriority(priority);
+        Paper savedPaper = paperRepository.save(paper);
+        return PaperMapper.INSTANCE.toDTO(savedPaper);
     }
 
     // Build link DOI (không lưu DB)

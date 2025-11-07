@@ -5,6 +5,7 @@ import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.Paper;
 import com.mss.prm_project.service.PaperService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -103,16 +104,29 @@ public class PaperController {
     @GetMapping("/{id}/citation")
     public ResponseEntity<String> getCitation(@PathVariable int id, @RequestParam String style) {
         Paper p = paperService.getPaperById(id);
-        String body = switch (style.toLowerCase()) {
-            case "apa" -> n(p.getCitationApa());
-            case "mla" -> n(p.getCitationMla());
-            case "bibtex" -> n(p.getCitationBibtex());
-            default -> "";
-        };
+        if (p == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body("Paper not found");
+        }
+
+        String body;
+        switch ((style == null ? "" : style.trim().toLowerCase())) {
+            case "apa"    -> body = n(p.getCitationApa());
+            case "mla"    -> body = n(p.getCitationMla());
+            case "bibtex" -> body = n(p.getCitationBibtex());
+            default -> {
+                return ResponseEntity.badRequest()
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .body("Unsupported style. Use apa | mla | bibtex");
+            }
+        }
+
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=UTF-8")
                 .body(body);
     }
-    private String n(String s){ return s == null ? "" : s; }
 
+    private String n(String s){ return s == null ? "" : s; }
 }
+

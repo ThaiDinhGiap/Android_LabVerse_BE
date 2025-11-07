@@ -1,7 +1,12 @@
 package com.mss.prm_project.service;
 
 import com.mss.prm_project.dto.ReadingProgressDTO;
+import com.mss.prm_project.entity.ReadingProgress;
+
+import java.util.List;
 
 public interface ReadingProgressService {
-    ReadingProgressDTO createReadingProgressForUserAndPaper(Long userId, Long paperId, int lastReadPage, int totalPages);
+    ReadingProgressDTO createReadingProgressForUserAndPaper(int collectionId, int paperId, int lastReadPage, int totalPages);
+    List<ReadingProgressDTO> getAllReadingProgressByCollection(int collectionId, int paperId);
+    List<ReadingProgressDTO> getPersonalReadingProgress();
 }

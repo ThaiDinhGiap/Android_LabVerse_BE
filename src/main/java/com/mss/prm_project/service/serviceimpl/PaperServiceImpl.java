@@ -218,14 +218,11 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public boolean deleteFavoritePaper(long paperId, long userId) {
-        Paper paper = favoritePaperRepository.findByUserUserIdAndPaperPaperId(userId, paperId).getPaper();
-        if (paper == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paper not found");
-        }
-        paperRepository.delete(paper);
-        return true;
+    public List<PaperDTO> getNewestAdded() {
+        return null;
     }
+
+
 
     @Override
     public PaperDTO findByPaperId(long paperId) {
@@ -237,7 +234,40 @@ public class PaperServiceImpl implements PaperService {
         }
         return dto;
     }
+
+    @Override
+    public PaperDTO changePaperPriority(long paperId,  int priority) {
+        Paper paper = paperRepository.findById(paperId).orElseThrow(()-> new IllegalArgumentException("Paper not found"));
+        paper.setPriority(priority);
+        Paper savedPaper = paperRepository.save(paper);
+        return PaperMapper.INSTANCE.toDTO(savedPaper);
+    }
+
+//    // Build link DOI (không lưu DB)
+//    public String doiLink(String doi) {
+//        if (doi == null) return null;
+//        String d = doi.trim();
+//        return d.isEmpty() ? null : "https://doi.org/" + d;
+//    }
 //
+//    public String toAPA(Paper p) {
+//        String authors = apaAuthors(p.getAuthor());
+//        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "n.d.";
+//        String title = nz(p.getTitle());
+//        String journal = nz(p.getJournal());
+//        String link = (p.getDoi() != null && !p.getDoi().isBlank()) ? doiLink(p.getDoi()) : null;
+//
+//        return String.format("%s (%s). %s. %s.%s",
+//                authors, year, title, journal,
+//                link != null ? " " + link : "");
+//    }
+//
+//    public String toMLA(Paper p) {
+//        String authors = mlaAuthors(p.getAuthor());
+//        String year = (p.getPublishDate() != null) ? String.valueOf(p.getPublishDate().getYear()) : "";
+//        String title = nz(p.getTitle());
+//        String journal = nz(p.getJournal());
+//        String link = (p.getDoi() != null && !p.getDoi().isBlank()) ? doiLink(p.getDoi()) : null;
 //    public String doiLink(String doiRaw) {
 //        if (doiRaw == null) return null;
 //        String d = doiRaw.trim();

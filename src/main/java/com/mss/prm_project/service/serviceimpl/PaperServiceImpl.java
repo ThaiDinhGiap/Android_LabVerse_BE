@@ -76,13 +76,11 @@ public class PaperServiceImpl implements PaperService {
         file.setFileUrl(s3ServiceV2.uploadFile(multipartFile));
 //        file.setFileUrl("https://prm392-labverse.s3.ap-southeast-2.amazonaws.com/uploads/1760692462213_erd_prm.drawio.pdf");
         File savedfile = fileRepository.save(file);
-
-        Paper paper = PaperMapper.INSTANCE.toEntity(dto);
-
         String username = SecurityUtils.getCurrentUserName().get();
         User user = userRepository.findByUsername(username).get();
+        Paper paper = PaperMapper.INSTANCE.toEntity(dto);
         paper.setUser(user);
-
+        paper.setAuthor(user.getFullName());
         paper.setCitationApa(toAPA(paper));
         paper.setCitationMla(toMLA(paper));
         paper.setCitationBibtex(toBibTeX(paper));

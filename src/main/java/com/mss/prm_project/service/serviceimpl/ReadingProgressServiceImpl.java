@@ -39,12 +39,20 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
             readingProgress = new ReadingProgress();
             readingProgress.setUser(user);
             readingProgress.setPaper(paper);
-            readingProgress.setLatestPage(0);
+            readingProgress.setLatestPage(lastReadPage);
             if(Objects.nonNull(collection)) {
                 readingProgress.setCollection(collection);
             }
-            readingProgress.setProgressStatus("To Read");
-            readingProgress.setCompletionPercent(BigDecimal.valueOf(0));
+            readingProgress.setCompletionPercent( BigDecimal.valueOf(((double) lastReadPage / totalPages) * 100));
+            String progressStatus;
+            if (lastReadPage == 0) {
+                progressStatus = "To Read";
+            } else if (lastReadPage == totalPages) {
+                progressStatus = "Completed";
+            } else {
+                progressStatus = "Reading";
+            }
+            readingProgress.setProgressStatus(progressStatus);
         }
         else {
             if(lastReadPage > readingProgress.getLatestPage()){

@@ -107,7 +107,6 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUserName().get()).
                                     orElseThrow(()-> new IllegalArgumentException("User not found"));
         List<Paper> papers = user.getPaper();
-        List<ReadingProgress> results = new ArrayList<>();
         if(papers != null) {
             for(Paper paper : papers){
                 ReadingProgress readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperId(
@@ -122,14 +121,10 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
                     readingProgress.setProgressStatus("To Read");
                     readingProgress.setCompletionPercent(BigDecimal.valueOf(0));
                     ReadingProgress saveReadingProgress = readingProgressRepository.save(readingProgress);
-                    results.add(saveReadingProgress);
                 }
-                else{
-                    results.add(readingProgress);
-                }
-                return results.stream().map(ReadingProgressMapper.INSTANCE::toDTO).collect(Collectors.toList());
             }
         }
-        return null;
+        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserId(user.getUserId());
+        return results.stream().map(ReadingProgressMapper.INSTANCE::toDTO).toList();
     }
 }

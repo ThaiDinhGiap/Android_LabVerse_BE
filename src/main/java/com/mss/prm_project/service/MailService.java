@@ -9,4 +9,5 @@ public interface MailService {
     void sentTextMail(Mail mail);
 
     void sentVerifyMail(String email, String token);
+    public void sendNotification(String toEmail, String text);
 }

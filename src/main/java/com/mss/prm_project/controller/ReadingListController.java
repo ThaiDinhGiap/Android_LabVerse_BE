@@ -3,6 +3,7 @@ package com.mss.prm_project.controller;
 import com.mss.prm_project.entity.User;
 
 import com.mss.prm_project.model.*;
+import com.mss.prm_project.service.MailService;
 import com.mss.prm_project.service.ReadingListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import java.util.List;
 public class ReadingListController {
 
     private final ReadingListService readingListService;
-
+    private final MailService mailService;
     // -----------------------------------------------------------------------
     // API 1: TẠO DANH SÁCH MỚI (CREATE)
     // POST /api/readinglists
@@ -127,8 +128,9 @@ public class ReadingListController {
                 request.getInvitedUserEmail(), // Truyền Email
                 user.getUserId()           // ID của chủ sở hữu
         );
+        String message = "User with email '" + request.getInvitedUserEmail() + "' successfully added as a viewer to reading list. You can login to Labverse and access Reading List to view Papers";
+        mailService.sendNotification(request.getInvitedUserEmail(),message);
 
-        String message = "User with email '" + request.getInvitedUserEmail() + "' successfully added as a viewer to reading list.";
         return ResponseEntity.ok(
                 ResponseObject.builder().message(message).data(null).build()
         );

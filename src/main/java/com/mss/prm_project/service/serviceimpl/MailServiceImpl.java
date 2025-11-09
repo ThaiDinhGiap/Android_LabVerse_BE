@@ -6,6 +6,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,7 +21,25 @@ public class MailServiceImpl implements MailService {
     @Value("${spring.mail.username}")
     private String defaultMailFrom;
 
+    public void sendNotification(String toEmail, String text) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
 
+            message.setFrom(defaultMailFrom);
+            message.setTo(toEmail);
+            message.setSubject("Labverse announcement");
+            message.setText(text);
+
+            // Gửi mail
+            mailSender.send(message);
+
+            System.out.println("Send successfully to email: " + toEmail);
+
+        } catch (MailException e) {
+            // Xử lý lỗi nếu gửi không thành công
+            System.err.println("Fail to send email not found: " + e.getMessage());
+        }
+    }
     @Override
     public void sendHtmlMail(Mail mail) {
         try {

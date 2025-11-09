@@ -6,6 +6,7 @@ import com.mss.prm_project.entity.User;
 import com.mss.prm_project.model.*;
 import com.mss.prm_project.service.CollectionService;
 import com.mss.prm_project.service.FcmService;
+import com.mss.prm_project.service.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class CollectionController {
 
     private final CollectionService collectionService;
     private final FcmService fcmService;
+    private final MailService mailService;
 
     @PostMapping
     public ResponseEntity<CollectionResponse> createCollection(
@@ -76,6 +78,8 @@ public class CollectionController {
                 request.getInvitedUserEmail(),
                 user
         );
+        String message = "User with email '" + request.getInvitedUserEmail() + "' successfully added as a member to Collection. You can login to Labverse and access Collection to view Papers";
+        mailService.sendNotification(request.getInvitedUserEmail(),message);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

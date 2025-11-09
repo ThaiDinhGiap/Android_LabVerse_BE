@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Table(
         name = "reading_progress",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "paper_id"})
+                @UniqueConstraint(columnNames = {"user_id", "paper_id", "collection_id"})
         }
 )
 public class ReadingProgress extends BaseEntity {

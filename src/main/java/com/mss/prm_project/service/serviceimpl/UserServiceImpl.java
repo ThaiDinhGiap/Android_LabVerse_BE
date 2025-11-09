@@ -141,7 +141,6 @@ public class UserServiceImpl implements UserService {
     public void updateFcmToken(String username, String fcmToken) throws FirebaseMessagingException {
         User user = userRepository.findByUsername(username).get();
         user.setFcmToken(fcmToken);
-        fcmService.sendNotificationToToken(fcmToken, "FCM Token Updated", "Your FCM token has been successfully updated.");
         userRepository.save(user);
     }
 }

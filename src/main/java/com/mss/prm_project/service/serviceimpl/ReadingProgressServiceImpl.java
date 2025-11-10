@@ -29,11 +29,12 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUserName().get()).get();
         Paper paper = paperRepository.findById((long)paperId).orElseThrow(()-> new IllegalArgumentException("Paper not found"));
         Collection collection = collectionRepository.findById((long)collectionId).orElse(null);
+        List<ReadingProgress> checking = new ArrayList<>();
         ReadingProgress readingProgress = null;
         if (collectionId >0) {
             readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperIdCollectionCollectionId(user.getUserId(), paperId, collectionId);
         }else {
-            readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperId(user.getUserId(), paperId);
+            checking = readingProgressRepository.findByUserUserIdAndPaperPaperId(user.getUserId(), paperId);
         }
         if (readingProgress == null) {
             readingProgress = new ReadingProgress();
@@ -109,18 +110,18 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         List<Paper> papers = user.getPaper();
         if(papers != null) {
             for(Paper paper : papers){
-                ReadingProgress readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperId(
+                List<ReadingProgress>  readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperId(
                         user.getUserId(),
                         paper.getPaperId()
                 );
                 if (readingProgress == null) {
-                    readingProgress = new ReadingProgress();
-                    readingProgress.setUser(user);
-                    readingProgress.setPaper(paper);
-                    readingProgress.setLatestPage(0);
-                    readingProgress.setProgressStatus("To Read");
-                    readingProgress.setCompletionPercent(BigDecimal.valueOf(0));
-                    ReadingProgress saveReadingProgress = readingProgressRepository.save(readingProgress);
+                    ReadingProgress newItem = new ReadingProgress();
+                    newItem.setUser(user);
+                    newItem.setPaper(paper);
+                    newItem.setLatestPage(0);
+                    newItem.setProgressStatus("To Read");
+                    newItem.setCompletionPercent(BigDecimal.valueOf(0));
+                    readingProgressRepository.save(newItem);
                 }
             }
         }

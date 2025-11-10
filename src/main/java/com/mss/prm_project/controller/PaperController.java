@@ -113,6 +113,12 @@ public class PaperController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/recently-read")
+    public ResponseEntity<List<PaperDTO>> getRecentlyReadPapers(@RequestParam("userId") int userId) {
+        return null;
+    }
+
+
 
     @GetMapping("/{id}/citation")
     public ResponseEntity<String> getCitation(@PathVariable int id, @RequestParam String style) {

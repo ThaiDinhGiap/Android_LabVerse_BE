@@ -192,10 +192,11 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public FavoritePaperDTO addtoFavoritePapers(long userId, long paperId) {
-        User user = userRepository.findById(userId).orElseThrow(null);
+    public FavoritePaperDTO addToFavoritePapers(long paperId) {
+        String username = SecurityUtils.getCurrentUserName().get();
+        User user = userRepository.findByUsername(username).get();
         Paper paper = paperRepository.findById(paperId).orElseThrow(null);
-        if (user == null || paper == null) {
+        if (paper == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or Paper not found");
         }
         FavoritePaper favoritePaper = new FavoritePaper();
@@ -213,6 +214,26 @@ public class PaperServiceImpl implements PaperService {
         }
         paperRepository.delete(paper);
         return true;
+    }
+
+    @Override
+    public boolean deleteFavoritePaper(long favoritePaperId) {
+        FavoritePaper favoritePaper = favoritePaperRepository.findById(favoritePaperId).orElseThrow(null);
+        if (favoritePaper == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Favorite Paper not found");
+        }
+        favoritePaperRepository.delete(favoritePaper);
+        return true;
+    }
+
+    @Override
+    public List<FavoritePaperDTO> getFavoriteByUser() {
+        String username = SecurityUtils.getCurrentUserName().get();
+        User user = userRepository.findByUsername(username).get();
+        List<FavoritePaper> favoritePapers = favoritePaperRepository.findAllByUserUserId(user.getUserId());
+        return favoritePapers.stream()
+                .map(FavouriteMapper.INSTANCE::toDTO)
+                .toList();
     }
 
     @Override

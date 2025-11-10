@@ -29,9 +29,13 @@ public interface PaperService {
 
     List<PaperDTO> getPaperByPriority(long collectionid ,int priority);
 
-    FavoritePaperDTO addtoFavoritePapers(long userId, long paperId);
+    FavoritePaperDTO addToFavoritePapers(long paperId);
 
     boolean deletePaper(long paperId);
+
+    boolean deleteFavoritePaper(long favoritePaperId);
+
+    List<FavoritePaperDTO> getFavoriteByUser();
 
     List<PaperDTO> getNewestAdded();
 

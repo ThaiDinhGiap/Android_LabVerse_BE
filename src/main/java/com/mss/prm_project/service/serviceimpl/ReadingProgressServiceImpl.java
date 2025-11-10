@@ -36,7 +36,7 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         }else {
             checking = readingProgressRepository.findByUserUserIdAndPaperPaperId(user.getUserId(), paperId);
         }
-        if (readingProgress == null) {
+        if (readingProgress == null && checking.isEmpty()) {
             readingProgress = new ReadingProgress();
             readingProgress.setUser(user);
             readingProgress.setPaper(paper);
@@ -125,7 +125,7 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
                 }
             }
         }
-        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserIdOrderByUpdatedAt(user.getUserId());
+        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserIdOrderByUpdatedAtDesc(user.getUserId());
         return results.stream().map(ReadingProgressMapper.INSTANCE::toDTO).toList();
     }
 
@@ -134,7 +134,7 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         String username = SecurityUtils.getCurrentUserName().get();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserIdOrderByUpdatedAt(user.getUserId());
+        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserIdOrderByUpdatedAtDesc(user.getUserId());
         return results.stream().map(ReadingProgressMapper.INSTANCE::toDTO).toList();
     }
 }

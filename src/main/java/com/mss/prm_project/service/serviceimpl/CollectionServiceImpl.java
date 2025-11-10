@@ -215,6 +215,7 @@ public class CollectionServiceImpl implements CollectionService {
                     SimplePaperResponse response = new SimplePaperResponse();
                     response.setPaperId(paper.getPaperId());
                     response.setTitle(paper.getTitle());
+                    response.setAuthor(paper.getAuthor());
                     return  response;
                 }).collect(Collectors.toList());
 

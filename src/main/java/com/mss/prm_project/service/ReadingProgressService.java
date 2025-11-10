@@ -12,4 +12,5 @@ public interface ReadingProgressService {
 
     List<ReadingProgressDTO> getPersonalReadingProgress();
 
+    List<ReadingProgressDTO> getRecentRead();
 }

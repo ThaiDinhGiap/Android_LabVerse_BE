@@ -33,7 +33,7 @@ public interface PaperService {
 
     boolean deletePaper(long paperId);
 
-    boolean deleteFavoritePaper(long favoritePaperId);
+    boolean deleteFavoritePaper(long paperId);
 
     List<FavoritePaperDTO> getFavoriteByUser();
 

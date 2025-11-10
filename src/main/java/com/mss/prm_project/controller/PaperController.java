@@ -108,8 +108,8 @@ public class PaperController {
     }
 
     @DeleteMapping("/delete-favourite")
-    public ResponseEntity<Boolean> deleteFavoritePapers(@RequestParam("favoriteId") long favoriteId) {
-        boolean result = paperService.deleteFavoritePaper(favoriteId);
+    public ResponseEntity<Boolean> deleteFavoritePapers(@RequestParam("paperId") long paperId) {
+        boolean result = paperService.deleteFavoritePaper(paperId);
         return ResponseEntity.ok(result);
     }
 
@@ -124,13 +124,6 @@ public class PaperController {
         PaperDTO result = paperService.changePaperPriority(paperId, priority);
         return ResponseEntity.ok(result);
     }
-
-    @GetMapping("/recently-read")
-    public ResponseEntity<List<PaperDTO>> getRecentlyReadPapers(@RequestParam("userId") int userId) {
-        return null;
-    }
-
-
 
     @GetMapping("/{id}/citation")
     public ResponseEntity<String> getCitation(@PathVariable int id, @RequestParam String style) {

@@ -40,7 +40,7 @@ public interface ReadingProgressRepository extends JpaRepository<ReadingProgress
         WHERE rp.paper.paperId = :paperId
         AND rp.user.userId = :userId
     """)
-    ReadingProgress findByUserUserIdAndPaperPaperId( @Param("userId") int userId,@Param("paperId") int paperId);
+    List<ReadingProgress>  findByUserUserIdAndPaperPaperId( @Param("userId") int userId,@Param("paperId") int paperId);
 
     List<ReadingProgress> getAllByUserUserId(int userId);
 }

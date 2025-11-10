@@ -102,9 +102,21 @@ public class PaperController {
     }
 
     @PostMapping("/add-to-favourite")
-    public ResponseEntity<FavoritePaperDTO> addToFavoritePapers(@RequestParam("userId") long userId, @RequestParam("paperId") long paperId) {
-        FavoritePaperDTO result = paperService.addtoFavoritePapers(userId, paperId);
+    public ResponseEntity<FavoritePaperDTO> addToFavoritePapers(@RequestParam("paperId") long paperId) {
+        FavoritePaperDTO result = paperService.addToFavoritePapers(paperId);
         return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/delete-favourite")
+    public ResponseEntity<Boolean> deleteFavoritePapers(@RequestParam("favoriteId") long favoriteId) {
+        boolean result = paperService.deleteFavoritePaper(favoriteId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/favorite-by-user")
+    public ResponseEntity<List<FavoritePaperDTO>> getFavoriteByUser() {
+        List<FavoritePaperDTO> results = paperService.getFavoriteByUser();
+        return ResponseEntity.ok(results);
     }
 
     @PutMapping("/change-priority")

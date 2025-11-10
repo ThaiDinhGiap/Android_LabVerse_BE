@@ -45,4 +45,10 @@ public class ReadingProgressController {
         List<ReadingProgressDTO> results =  readingProgressService.getPersonalReadingProgress();
         return new ResponseEntity<>(results, HttpStatus.OK);
     }
+
+    @GetMapping("/recently-read")
+    public ResponseEntity<List<ReadingProgressDTO>> getRecentlyReadPapers() {
+        List<ReadingProgressDTO> results = readingProgressService.getRecentRead();
+        return new ResponseEntity<>(results, HttpStatus.OK);
+    }
 }

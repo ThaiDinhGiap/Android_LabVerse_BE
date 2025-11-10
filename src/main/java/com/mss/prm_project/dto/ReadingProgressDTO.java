@@ -16,5 +16,6 @@ public class ReadingProgressDTO {
     PaperDTO paper;
     int latestPage;
     String progressStatus;
+    String collectionName;
     BigDecimal completionPercent;
 }

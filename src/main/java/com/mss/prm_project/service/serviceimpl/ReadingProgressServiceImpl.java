@@ -125,7 +125,16 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
                 }
             }
         }
-        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserId(user.getUserId());
+        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserIdOrderByUpdatedAt(user.getUserId());
+        return results.stream().map(ReadingProgressMapper.INSTANCE::toDTO).toList();
+    }
+
+    @Override
+    public List<ReadingProgressDTO> getRecentRead() {
+        String username = SecurityUtils.getCurrentUserName().get();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        List<ReadingProgress> results = readingProgressRepository.getAllByUserUserIdOrderByUpdatedAt(user.getUserId());
         return results.stream().map(ReadingProgressMapper.INSTANCE::toDTO).toList();
     }
 }

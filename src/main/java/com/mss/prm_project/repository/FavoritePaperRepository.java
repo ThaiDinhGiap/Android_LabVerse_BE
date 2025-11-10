@@ -9,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface FavoritePaperRepository extends JpaRepository<FavoritePaper, Long> {
-    FavoritePaper findByUserUserIdAndPaperPaperId(@RequestParam Long userId, @RequestParam Long paperId);
+
+    FavoritePaper findByUserUserIdAndPaperPaperId(@RequestParam int userId, @RequestParam int paperId);
+
     List<FavoritePaper> findAllByUserUserId(@RequestParam int userId);
 }

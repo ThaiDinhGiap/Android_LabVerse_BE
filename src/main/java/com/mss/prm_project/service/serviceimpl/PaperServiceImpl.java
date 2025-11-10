@@ -217,8 +217,10 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public boolean deleteFavoritePaper(long favoritePaperId) {
-        FavoritePaper favoritePaper = favoritePaperRepository.findById(favoritePaperId).orElseThrow(null);
+    public boolean deleteFavoritePaper(long paperId) {
+        String username = SecurityUtils.getCurrentUserName().get();
+        User user = userRepository.findByUsername(username).get();
+        FavoritePaper favoritePaper = favoritePaperRepository.findByUserUserIdAndPaperPaperId(user.getUserId(), (int)paperId);
         if (favoritePaper == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Favorite Paper not found");
         }

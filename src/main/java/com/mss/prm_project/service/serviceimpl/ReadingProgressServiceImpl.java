@@ -29,14 +29,13 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUserName().get()).get();
         Paper paper = paperRepository.findById((long)paperId).orElseThrow(()-> new IllegalArgumentException("Paper not found"));
         Collection collection = collectionRepository.findById((long)collectionId).orElse(null);
-        List<ReadingProgress> checking = new ArrayList<>();
         ReadingProgress readingProgress = null;
         if (collectionId >0) {
             readingProgress = readingProgressRepository.findByUserUserIdAndPaperPaperIdCollectionCollectionId(user.getUserId(), paperId, collectionId);
         }else {
-            checking = readingProgressRepository.findByUserUserIdAndPaperPaperId(user.getUserId(), paperId);
+            readingProgress = readingProgressRepository.findPaperInPersonal(user.getUserId(), paperId);
         }
-        if (readingProgress == null && checking.isEmpty()) {
+        if (readingProgress == null) {
             readingProgress = new ReadingProgress();
             readingProgress.setUser(user);
             readingProgress.setPaper(paper);

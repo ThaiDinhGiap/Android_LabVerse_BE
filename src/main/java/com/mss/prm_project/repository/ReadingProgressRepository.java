@@ -42,6 +42,15 @@ public interface ReadingProgressRepository extends JpaRepository<ReadingProgress
     """)
     List<ReadingProgress>  findByUserUserIdAndPaperPaperId( @Param("userId") int userId,@Param("paperId") int paperId);
 
+    @Query("""
+        SELECT rp
+        FROM ReadingProgress rp
+        WHERE rp.paper.paperId = :paperId
+        AND rp.user.userId = :userId
+        AND rp.collection IS NULL
+    """)
+    ReadingProgress findPaperInPersonal( @Param("userId") int userId,@Param("paperId") int paperId);
+
     List<ReadingProgress> getAllByUserUserId(int userId);
 
     List<ReadingProgress> getAllByUserUserIdOrderByUpdatedAtDesc(int userId);

@@ -54,8 +54,18 @@ public class PaperController {
 
 
     @GetMapping("/newest-unread")
-    public ResponseEntity<List<PaperDTO>> getNewestUnread(@RequestParam int userId) {
-        List<PaperDTO> papers = paperService.getTop10NewestUnreadPapers(userId);
+    public ResponseEntity<List<PaperDTO>> getNewestUnread(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String journal,
+            @RequestParam(required = false) Integer priority,
+            @RequestParam(required = false) String publisher,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate,
+            @RequestParam(required = false) Integer userId)
+     {
+        List<PaperDTO> papers = paperService.getTop10NewestUnreadPapers(q, author, journal, priority, publisher, date, fromDate, toDate, userId);
         return ResponseEntity.ok(papers);
     }
 

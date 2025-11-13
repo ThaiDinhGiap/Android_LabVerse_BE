@@ -12,8 +12,33 @@ import java.util.List;
 
 @Repository
 public interface PaperRepository extends JpaRepository<Paper, Long> {
-    @Query("select p from Paper p where p not in (select rp.paper from ReadingProgress rp where rp.user.userId = :userId)")
-    List<Paper> findUnreadByUser(@Param("userId") int userId);
+    @Query("""
+    SELECT p FROM Paper p
+    WHERE p NOT IN (
+        SELECT rp.paper FROM ReadingProgress rp WHERE rp.user.userId = :userId
+    )
+    AND (:q IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :q, '%')))
+    AND (:author IS NULL OR LOWER(p.author) LIKE LOWER(CONCAT('%', :author, '%')))
+    AND (:journal IS NULL OR LOWER(p.journal) LIKE LOWER(CONCAT('%', :journal, '%')))
+    AND (:priority IS NULL OR p.priority = :priority)
+    AND (:publisher IS NULL OR LOWER(p.publisher) LIKE LOWER(CONCAT('%', :publisher, '%')))
+    AND (:dateFilter IS NULL OR p.publishDate = :dateFilter)
+    AND (:fromDate IS NULL OR p.createdAt >= :fromDate)
+    AND (:toDate IS NULL OR p.createdAt <= :toDate)
+    ORDER BY p.createdAt DESC
+""")
+    List<Paper> findUnreadByUser(
+            @Param("q") String q,
+            @Param("author") String author,
+            @Param("journal") String journal,
+            @Param("priority") Integer priority,
+            @Param("publisher") String publisher,
+            @Param("dateFilter") LocalDate dateFilter,
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("toDate") LocalDateTime toDate,
+            @Param("userId") Integer userId
+    );
+
     List<Paper> findByUserUserId(Integer userId);
 
     @Query("SELECT p FROM Paper p " +

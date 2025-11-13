@@ -10,7 +10,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PaperService {
-    List<PaperDTO> getTop10NewestUnreadPapers(int userId);
+    List<PaperDTO> getTop10NewestUnreadPapers(String q,
+                                              String author,
+                                              String journal,
+                                              Integer priority,
+                                              String publisher,
+                                              String date,
+                                              String fromDate,
+                                              String toDate,
+                                              Integer userId);
     Paper getPaperById(int paperId);
 //     List<PaperDTO> getPaperByUserId(int userId);
 

@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO createUser(User user) {
-        Optional<Role> role = roleRepository.findById(1L);
+        Optional<Role> role = roleRepository.findById(2L);
         user.setRole(role.get());
         return UserMapper.INSTANCE.userToUserDTO(userRepository.save(user));
     }

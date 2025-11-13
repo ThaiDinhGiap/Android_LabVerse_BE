@@ -3,6 +3,7 @@ package com.mss.prm_project.service.serviceimpl;
 import com.mss.prm_project.dto.FavoritePaperDTO;
 import com.mss.prm_project.dto.PaperDTO;
 import com.mss.prm_project.entity.*;
+import com.mss.prm_project.entity.Collection;
 import com.mss.prm_project.mapper.FavouriteMapper;
 import com.mss.prm_project.entity.FavoritePaper;
 import com.mss.prm_project.entity.File;
@@ -27,10 +28,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,12 +44,45 @@ public class PaperServiceImpl implements PaperService {
 
 
     @Override
-    public List<PaperDTO> getTop10NewestUnreadPapers(int userId) {
+    public List<PaperDTO> getTop10NewestUnreadPapers(
+            String q,
+            String author,
+            String journal,
+            Integer priority,
+            String publisher,
+            String dateStr,
+            String fromDateStr,
+            String toDateStr,
+            Integer userId
+    ) {
         if (!userRepository.existsById((long) userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
-        return paperRepository.findUnreadByUser(userId).stream().map(PaperMapper.INSTANCE::toDTO).toList();
+
+        LocalDate dateFilter = (dateStr != null && !dateStr.isEmpty())
+                ? LocalDate.parse(dateStr)
+                : null;
+        LocalDateTime fromDateTime = (fromDateStr != null && !fromDateStr.isEmpty())
+                ? LocalDate.parse(fromDateStr).atStartOfDay()
+                : null;
+        LocalDateTime toDateTime = (toDateStr != null && !toDateStr.isEmpty())
+                ? LocalDate.parse(toDateStr).atTime(LocalTime.MAX)
+                : null;
+
+        if (fromDateTime != null && toDateTime != null && fromDateTime.isAfter(toDateTime)) {
+            throw new IllegalArgumentException("fromDate must not be after toDate");
+        }
+
+
+        return paperRepository.findUnreadByUser(
+                q, author, journal, priority, publisher,
+                dateFilter, fromDateTime, toDateTime, userId
+        ).stream()
+                .limit(10)
+                .map(PaperMapper.INSTANCE::toDTO)
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public Paper getPaperById(int paperId) {

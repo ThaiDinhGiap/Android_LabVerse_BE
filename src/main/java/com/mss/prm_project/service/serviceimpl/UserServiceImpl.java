@@ -8,26 +8,32 @@ import com.mss.prm_project.dto.UserDTO;
 import com.mss.prm_project.entity.Role;
 import com.mss.prm_project.entity.User;
 import com.mss.prm_project.mapper.UserMapper;
+import com.mss.prm_project.model.NotificationPayload;
 import com.mss.prm_project.repository.RoleRepository;
 import com.mss.prm_project.service.FcmService;
+import com.mss.prm_project.service.RedisService;
 import com.mss.prm_project.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.mss.prm_project.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final FcmService fcmService;
+    private final RedisService redisService;
 
     @Override
     public UserDTO getUserById(Long userId) throws Exception {
@@ -86,6 +92,10 @@ public class UserServiceImpl implements UserService {
         } else {
             profileDTO.setGoogleLinked(false);
         }
+
+        String scheduledTime = redisService.getUserScheduledTime(user.getUserId());
+        profileDTO.setScheduledTime(scheduledTime);
+
         return profileDTO;
     }
 
@@ -111,6 +121,20 @@ public class UserServiceImpl implements UserService {
             user.setInstantPushNotification(settingDTO.isInstantNotification());
             user.setScheduledPushNotification(settingDTO.isScheduledNotification());
             userRepository.save(user);
+
+            String oldTime = redisService.getUserScheduledTime(user.getUserId());
+            String newTime = settingDTO.getScheduledTime();
+            if (oldTime != null && !oldTime.isEmpty()) {
+                redisService.removeUserFromTimeSet(oldTime, user.getUserId());
+            }
+            if (settingDTO.isScheduledNotification() && newTime != null && !newTime.isEmpty()) {
+                redisService.addUserToTimeSet(newTime, user.getUserId());
+                redisService.saveUserScheduledTime(user.getUserId(), newTime);
+            } else {
+
+                redisService.deleteUserScheduledTime(user.getUserId());
+            }
+
             return true;
         } catch (Exception e) {
             return false;
@@ -142,5 +166,33 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username).get();
         user.setFcmToken(fcmToken);
         userRepository.save(user);
+    }
+
+    @Override
+    public void sendUnreadNotificationsToUser(String username) throws FirebaseMessagingException {
+        User user = userRepository.findByUsername(username).get();
+        int userId = Math.toIntExact(user.getUserId());
+        String fcmToken = user.getFcmToken();
+
+        List<NotificationPayload> missedNotifications = redisService.getAndClearMissedNotifications(userId);
+
+        if (missedNotifications.isEmpty()) {
+            log.info("User {} không có thông báo lỡ.", userId);
+            return;
+        }
+
+        log.info("Đang gửi {} thông báo đã lỡ cho User {}...", missedNotifications.size(), userId);
+        for (NotificationPayload payload : missedNotifications) {
+            try {
+                fcmService.sendNotificationToToken(
+                        fcmToken,
+                        payload.title(),
+                        payload.body(),
+                        payload.data()
+                );
+            } catch (FirebaseMessagingException e) {
+                log.error("Lỗi khi gửi thông báo lỡ cho user {}: {}", userId, e.getMessage());
+            }
+        }
     }
 }

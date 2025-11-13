@@ -10,6 +10,8 @@ import com.mss.prm_project.repository.PaperRepository;
 import com.mss.prm_project.repository.UserRepository;
 import com.mss.prm_project.service.CollectionService;
 import com.mss.prm_project.service.FcmService;
+import com.mss.prm_project.service.RedisService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 import java.util.stream.Collectors;
 @Service
+@Slf4j
 public class CollectionServiceImpl implements CollectionService {
 
     private final CollectionRepository collectionRepository;
@@ -25,13 +28,15 @@ public class CollectionServiceImpl implements CollectionService {
     private final PaperRepository paperRepository;
     private final CollectionMemberRepository  collectionMemberRepository;
     private final FcmService fcm;
+    private final RedisService redisService;
 
-    public CollectionServiceImpl(CollectionRepository collectionRepository, UserRepository userRepository, PaperRepository paperRepository, CollectionMemberRepository collectionMemberRepository, FcmService fcm) {
+    public CollectionServiceImpl(CollectionRepository collectionRepository, UserRepository userRepository, PaperRepository paperRepository, CollectionMemberRepository collectionMemberRepository, FcmService fcm, RedisService redisService) {
         this.collectionRepository = collectionRepository;
         this.userRepository = userRepository;
         this.paperRepository = paperRepository;
         this.collectionMemberRepository = collectionMemberRepository;
         this.fcm = fcm;
+        this.redisService = redisService;
     }
 
     @Transactional
@@ -106,15 +111,23 @@ public class CollectionServiceImpl implements CollectionService {
                 .filter(User::isInstantPushNotification)
                 .toList();
         for (User u : users) {
-            if (u.getFcmToken() == null || u.getFcmToken().isBlank()) continue;
-
             Map<String, String> data = new HashMap<>();
             data.put("type", "instant");
             data.put("paperId", String.valueOf(paper.getPaperId()));
-            fcm.sendNotificationToToken(u.getFcmToken(),
-                    "New paper: " + paper.getTitle(),
-                    "Matches your interests — tap to read.",
-                    data);
+
+            if (u.getFcmToken() == null || u.getFcmToken().isBlank()) {
+                log.info("User {} không có FCM token, đang xếp hàng thông báo.", u.getUserId());
+                NotificationPayload payload =
+                        new NotificationPayload("New paper: " + paper.getTitle(),
+                                "Matches your interests — tap to read.",
+                                data);
+                redisService.queueMissedNotification(u.getUserId(), payload);
+            } else {
+                fcm.sendNotificationToToken(u.getFcmToken(),
+                        "New paper: " + paper.getTitle(),
+                        "Matches your interests — tap to read.",
+                        data);
+            }
         }
 
         CollectionResponse collectionResponse = new CollectionResponse();

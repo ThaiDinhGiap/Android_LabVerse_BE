@@ -21,4 +21,5 @@ public interface UserService {
     boolean updateNotificationPreferences(SettingDTO settingDTO);
     ProfileDTO updateProfile(ProfileDTO profileDTO) throws Exception;
     void updateFcmToken(String username, String fcmToken) throws FirebaseMessagingException;
+    void sendUnreadNotificationsToUser(String username) throws FirebaseMessagingException;
 }

@@ -101,7 +101,6 @@ public class CollectionController {
             @AuthenticationPrincipal User user) throws FirebaseMessagingException { // Lấy thông tin User đang đăng nhập
 
         String message = collectionService.removePaperFromCollection(collectionId, paperId, user);
-        fcmService.sendNotificationToToken(user.getFcmToken(), "Title", "Body");
         return ResponseEntity.ok(
                 ResponseObject.builder().message(message).data(null).build()
         );
@@ -115,7 +114,6 @@ public class CollectionController {
                 collectionId,
                 user
         );
-        fcmService.sendNotificationToToken(user.getFcmToken(), "Title", "Body");
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

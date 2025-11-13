@@ -93,6 +93,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             long userId = jwtService.extractUserId(raw);
             redisService.deleteRefreshToken(userId);
 
+            User user = userRepository.findById(userId).orElseThrow(() -> new Exception("User Not Found"));
+            user.setFcmToken(null);
+            userRepository.save(user);
+
             return ApiResponse.<String>builder()
                     .code(200)
                     .message("Logged out successfully")

@@ -7,4 +7,5 @@ public class SettingDTO {
     private String userName;
     private boolean instantNotification;
     private boolean scheduledNotification;
+    private String scheduledTime;
 }

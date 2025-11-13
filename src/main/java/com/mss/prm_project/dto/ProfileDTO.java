@@ -10,5 +10,6 @@ public class ProfileDTO {
     private String affiliation;
     private boolean instantPushNotification;
     private boolean scheduledPushNotification;
+    private String scheduledTime;
     private boolean isGoogleLinked;
 }

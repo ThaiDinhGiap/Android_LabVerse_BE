@@ -11,22 +11,6 @@ import java.util.Map;
 
 @Service
 public class FcmServiceImpl implements FcmService {
-
-    @Override
-    public String sendNotificationToToken(String token, String title, String body) throws FirebaseMessagingException {
-        Notification notification = Notification.builder()
-                .setTitle(title)
-                .setBody(body)
-                .build();
-
-        Message message = Message.builder()
-                .setToken(token)
-                .setNotification(notification)
-                .build();
-
-        return FirebaseMessaging.getInstance().send(message);
-    }
-
     @Override
     public String sendNotificationToToken(String token, String title, String body, Map<String, String> data) throws FirebaseMessagingException {
         Notification notification = Notification.builder()
